@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eleQtron — Quantum Advantage Tracker</title>
+<style>
+  :root {
+    --bg:#0f1115; --panel:#171a21; --line:#272b35; --fg:#e6e8ee; --muted:#8b93a7;
+    --accent:#6ea8fe; --good:#3fb68b; --warn:#e0a34e; --unknown:#5a6072; --chip:#232734;
+    --grid:#20242e;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+    font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  header { padding:16px 22px; border-bottom:1px solid var(--line);
+    display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size:17px; margin:0; font-weight:650; }
+  .sub { color:var(--muted); font-size:12.5px; }
+  .controls { margin-left:auto; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  button, label.file, select { background:var(--chip); color:var(--fg); border:1px solid var(--line);
+    padding:7px 12px; border-radius:8px; cursor:pointer; font-size:13px; }
+  button.active { border-color:var(--accent); color:var(--accent); }
+  button:hover, label.file:hover, select:hover { border-color:var(--accent); }
+  input[type=file]{ display:none; }
+  input[type=search]{ background:var(--panel); border:1px solid var(--line); color:var(--fg);
+    padding:7px 10px; border-radius:8px; min-width:170px; }
+  .tabs { display:flex; gap:6px; }
+  .wrap { padding:12px 22px 60px; }
+  /* column group toggles */
+  .groups { display:flex; flex-wrap:wrap; gap:6px; padding:10px 22px; border-bottom:1px solid var(--line);
+    align-items:center; }
+  .groups .lbl { color:var(--muted); font-size:12px; margin-right:4px; }
+  .gtog { font-size:12px; padding:4px 9px; border-radius:20px; }
+  /* table */
+  .tblwrap { overflow:auto; max-height:calc(100vh - 190px); border:1px solid var(--line); border-radius:10px; }
+  table { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; }
+  th, td { text-align:left; padding:7px 11px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { position:sticky; top:0; background:var(--panel); cursor:pointer; user-select:none;
+    font-weight:600; color:var(--muted); z-index:2; font-size:12.5px; }
+  th.g-head{color:var(--accent);} th.g-price{color:var(--good);}
+  th:first-child, td:first-child { position:sticky; left:0; background:var(--bg); font-weight:600; z-index:1; }
+  th:first-child { z-index:3; }
+  th.sorted::after { content:" ▾"; color:var(--accent); }
+  th.sorted.asc::after { content:" ▴"; }
+  tr:hover td { background:#12151c; }
+  .vendor { color:var(--accent); }
+  .unknown { color:var(--unknown); }
+  .yes{color:var(--good);} .no{color:var(--muted);}
+  a.src { color:var(--muted); text-decoration:none; margin-left:5px; font-size:10.5px;
+    border:1px solid var(--line); border-radius:5px; padding:0 4px; }
+  a.src:hover { color:var(--accent); border-color:var(--accent); }
+  .pct { color:var(--good); }
+  .meta { color:var(--muted); font-size:12px; margin-top:10px; }
+  .drop { border:2px dashed var(--line); border-radius:14px; margin:40px 22px; padding:60px;
+    text-align:center; color:var(--muted); }
+  .drop.hot { border-color:var(--accent); color:var(--fg); }
+  .hidden { display:none; }
+  /* charts */
+  .chartbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .chartbar .lbl { color:var(--muted); font-size:12px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  .card h3 { margin:0 0 2px; font-size:14px; }
+  .card .note { color:var(--muted); font-size:12px; margin:0 0 10px; }
+  svg text { fill:var(--muted); font-size:11px; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; font-size:12px; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; color:var(--fg); }
+  .legend i { width:10px; height:10px; border-radius:2px; display:inline-block; }
+  .tip { position:fixed; pointer-events:none; background:#000d; border:1px solid var(--line);
+    padding:6px 9px; border-radius:7px; font-size:12px; color:var(--fg); z-index:99; display:none; max-width:260px; }
+  .banner { background:#1c2130; border:1px solid var(--line); border-radius:8px; padding:8px 12px;
+    color:var(--warn); font-size:12.5px; margin-bottom:12px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>eleQtron · Quantum Advantage Tracker</h1>
+    <div class="sub" id="subtitle">Load <code>data/backends.json</code> to begin</div>
+  </div>
+  <div class="controls">
+    <div class="tabs">
+      <button id="tab-table" class="active">Table</button>
+      <button id="tab-charts">Charts</button>
+    </div>
+    <input type="search" id="q" placeholder="filter vendor / backend…">
+    <label class="file">Open JSON<input type="file" id="file" accept="application/json,.json"></label>
+  </div>
+</header>
+
+<div id="groups" class="groups hidden"><span class="lbl">Columns:</span></div>
+
+<div id="drop" class="drop">
+  Drag <b>backends.json</b> here, or use <b>Open JSON</b>.<br>
+  <span class="sub">Serve the folder (<code>python3 -m http.server</code>) to auto-load
+  the table and charts.</span>
+</div>
+
+<!-- TABLE VIEW -->
+<div class="wrap hidden" id="view-table">
+  <div class="tblwrap"><table id="tbl"></table></div>
+  <div class="meta" id="meta"></div>
+</div>
+
+<!-- CHARTS VIEW -->
+<div class="wrap hidden" id="view-charts">
+  <div class="chartbar">
+    <span class="lbl">Chart</span>
+    <select id="chartType">
+      <option value="scatter">Price vs spec (scatter)</option>
+      <option value="efficiency">Cost-efficiency ($ per QV / AQ)</option>
+      <option value="pricebar">Price by backend (bar)</option>
+    </select>
+    <span class="lbl" id="mLbl">Price metric</span>
+    <select id="metric"></select>
+    <span class="lbl" id="sLbl">Spec</span>
+    <select id="spec"></select>
+    <span class="lbl hidden" id="dLbl">Divisor</span>
+    <select id="divisor" class="hidden">
+      <option value="quantum_volume">Quantum Volume</option>
+      <option value="algorithmic_qubits">Algorithmic Qubits</option>
+    </select>
+    <label class="lbl" style="cursor:pointer"><input type="checkbox" id="logy" checked> log Y</label>
+  </div>
+  <div class="card">
+    <h3 id="chTitle"></h3>
+    <p class="note" id="chNote"></p>
+    <div id="chart"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+const UNKNOWN = "Not publicly disclosed";
+let DATA = [], sortCol = 0, sortAsc = true;
+
+/* ---------- column model: {key,label,group,kind,get} ---------- */
+const G = {id:"Identity", head:"Headline", topo:"Topology", fid:"Fidelity",
+           speed:"Speed", feat:"Features", price:"Pricing", prov:"Provenance"};
+function leaf(b,grp,k){ const g=b[grp]||{}; const v=g[k];
+  const s=(b.sources||[]).find(x=>x.field===`${grp}.${k}`); return {value:v, source:s&&s.url}; }
+function prov(b,name){ const v=b[name]; if(v&&typeof v==="object") return {value:v.value, source:v.source}; return {value:v}; }
+function scalar(v){ return {value:v}; }
+function techSrc(b){ const s=(b.sources||[]).find(x=>x.field&&x.field.indexOf("pricing.")!==0); return s||{}; }
+function priceSrc(b){ const s=(b.sources||[]).find(x=>x.field&&x.field.indexOf("pricing.")===0); return s||{}; }
+
+const COLS = [
+  ["id","ID","id","str",       b=>scalar(b.id)],
+  ["type","Type","id","str",   b=>scalar(b.type)],
+  ["vendor","Vendor","id","vendor", b=>scalar(b.vendor)],
+  ["model","Model","id","str", b=>scalar(b.model)],
+  ["system_name","System","id","str", b=>scalar(b.system_name)],
+  ["backend_name","Backend","id","str", b=>scalar(b.backend_name)],
+  ["planned","Planned Rel.","id","str", b=>scalar(b.planned_release)],
+  ["commercial","Commercial","id","str", b=>scalar(b.commercial_release)],
+
+  ["argmax","Argmax","head","str", b=>prov(b,"argmax")],
+  ["black_box","Algo Qubits","head","str", b=>prov(b,"black_box")],
+  ["vendor_metric","Vendor metric","head","str", b=>prov(b,"vendor_metric")],
+  ["theo","Theo max 2^","head","num", b=>({value: (b.derived_metrics&&b.derived_metrics.theoretical_max&&b.derived_metrics.theoretical_max.log2_value!=null)?round(b.derived_metrics.theoretical_max.log2_value):UNKNOWN, source:(b.theoretical_max||{}).source})],
+  ["qv","Quantum Vol","head","num", b=>prov(b,"quantum_volume")],
+
+  ["qubits","#Qubits","topo","num", b=>leaf(b,"qpu_topology","qubits")],
+  ["topo_type","Topology","topo","str", b=>leaf(b,"qpu_topology","type")],
+  ["edges","#Edges","topo","num", b=>leaf(b,"qpu_topology","edges")],
+
+  ["2q_max","2Q max","fid","pct", b=>leaf(b,"fidelity","2q_max")],
+  ["2q_avg","2Q avg","fid","pct", b=>leaf(b,"fidelity","2q_avg")],
+  ["2q_median","2Q median","fid","pct", b=>leaf(b,"fidelity","2q_median")],
+  ["2q_min","2Q min","fid","pct", b=>leaf(b,"fidelity","2q_min")],
+  ["1q_max","1Q max","fid","pct", b=>leaf(b,"fidelity","1q_max")],
+  ["1q_avg","1Q avg","fid","pct", b=>leaf(b,"fidelity","1q_avg")],
+  ["1q_min","1Q min","fid","pct", b=>leaf(b,"fidelity","1q_min")],
+  ["spam","SPAM avg","fid","pct", b=>leaf(b,"fidelity","spam_avg")],
+
+  ["1q_t","1Q time (s)","speed","str", b=>leaf(b,"operation_speed","1q_gate_time_s")],
+  ["2q_t","2Q time (s)","speed","str", b=>leaf(b,"operation_speed","2q_gate_time_s")],
+  ["ro_t","Readout (s)","speed","str", b=>leaf(b,"operation_speed","readout_time_s")],
+  ["sr_min","Shot/s min","speed","num", b=>leaf(b,"operation_speed","shot_rate_min")],
+  ["sr_avg","Shot/s avg","speed","num", b=>leaf(b,"operation_speed","shot_rate_avg")],
+  ["sr_max","Shot/s max","speed","num", b=>leaf(b,"operation_speed","shot_rate_max")],
+  ["clops","CLOPS","speed","num", b=>leaf(b,"operation_speed","clops")],
+  ["cph","Credits/hr","speed","str", b=>leaf(b,"operation_speed","credits_per_hour")],
+
+  ["mcm","Mid-circ meas","feat","bool", b=>leaf(b,"features","mid_circuit_measurement")],
+  ["cond","MCM cond.","feat","bool", b=>leaf(b,"features","conditional_logic")],
+  ["par2q","Parallel 2Q","feat","bool", b=>leaf(b,"features","parallel_2q")],
+  ["reuse","Qubit reuse","feat","bool", b=>leaf(b,"features","qubit_reuse")],
+  ["hybrid","Hybrid","feat","bool", b=>leaf(b,"features","hybrid_execution")],
+  ["uptime","Uptime","feat","str", b=>leaf(b,"features","uptime")],
+
+  ["p1q","Per-1Q","price","str", b=>leaf(b,"pricing","per_1q_gate")],
+  ["p2q","Per-2Q","price","str", b=>leaf(b,"pricing","per_2q_gate")],
+  ["pit","Per-iter","price","str", b=>leaf(b,"pricing","per_iteration")],
+  ["psh","Per-shot","price","str", b=>leaf(b,"pricing","per_shot")],
+  ["ptk","Per-task","price","str", b=>leaf(b,"pricing","per_task")],
+  ["psec","Price/s","price","str", b=>leaf(b,"pricing","per_second")],
+  ["phr","Price/hr","price","str", b=>leaf(b,"pricing","per_hour")],
+  ["pmo","Price/mo","price","str", b=>leaf(b,"pricing","per_month")],
+  ["psys","Price/system","price","str", b=>leaf(b,"pricing","per_system")],
+  ["pcom","Comment","price","str", b=>leaf(b,"pricing","comments")],
+
+  ["tsrc","Tech src","prov","link", b=>{const s=techSrc(b); return {value:s.retrieved||UNKNOWN, source:s.url};}],
+  ["psrc","Price src","prov","link", b=>{const s=priceSrc(b); return {value:s.retrieved||UNKNOWN, source:s.url};}],
+];
+const GROUP_ORDER = ["id","head","topo","fid","speed","feat","price","prov"];
+let VISIBLE = new Set(["id","head","topo","fid","price","prov"]); // fid on, speed/feat off by default to keep width sane
+
+/* ---------- helpers ---------- */
+function isU(v){ return v==null || v===UNKNOWN || v===""; }
+function round(x){ return Math.round(x*100)/100; }
+function fmtCell(cell, kind){
+  const v = cell.value;
+  if (isU(v)) return `<span class="unknown">—</span>`;
+  let text = String(v), cls="";
+  if (kind==="pct" && typeof v==="number"){ text=(v*100).toFixed(3).replace(/0+$/,"").replace(/\.$/,"")+"%"; cls="pct"; }
+  else if (kind==="num" && typeof v==="number") text=v.toLocaleString();
+  else if (kind==="vendor") cls="vendor";
+  else if (kind==="bool"){ const t=/^(yes|true|supported|available)/i.test(text); cls=t?"yes":"no"; }
+  const link = cell.source ? ` <a class="src" href="${cell.source}" target="_blank" rel="noopener" title="${cell.source}">src</a>` : "";
+  return `<span class="${cls}">${text}</span>${link}`;
+}
+function activeCols(){ return COLS.filter(c=>VISIBLE.has(c[2])); }
+
+/* ---------- table ---------- */
+function renderGroups(){
+  const el=document.getElementById("groups");
+  el.querySelectorAll(".gtog").forEach(n=>n.remove());
+  GROUP_ORDER.forEach(g=>{
+    const b=document.createElement("button");
+    b.className="gtog"+(VISIBLE.has(g)?" active":""); b.textContent=G[g];
+    b.onclick=()=>{ VISIBLE.has(g)?VISIBLE.delete(g):VISIBLE.add(g);
+      if(sortCol>=activeCols().length) sortCol=0; renderGroups(); renderTable(); };
+    el.appendChild(b);
+  });
+}
+function renderTable(){
+  const cols=activeCols();
+  const q=(document.getElementById("q").value||"").toLowerCase();
+  let rows=DATA.filter(b=>((b.backend_name||"")+" "+(b.vendor||"")+" "+(b.type||"")).toLowerCase().includes(q));
+  const acc=cols[sortCol][4];
+  rows.sort((a,z)=>{
+    const av=sv(acc(a)), zv=sv(acc(z));
+    if(av<zv) return sortAsc?-1:1; if(av>zv) return sortAsc?1:-1; return 0;
+  });
+  const head="<tr>"+cols.map((c,i)=>
+    `<th class="g-${c[2]} ${i===sortCol?'sorted '+(sortAsc?'asc':''):''}" data-i="${i}">${c[1]}</th>`).join("")+"</tr>";
+  const body=rows.map(b=>"<tr>"+cols.map(c=>`<td>${fmtCell(c[4](b), c[3])}</td>`).join("")+"</tr>").join("");
+  document.getElementById("tbl").innerHTML=head+body;
+  document.querySelectorAll("#tbl th").forEach(th=>th.onclick=()=>{
+    const i=+th.dataset.i; if(i===sortCol) sortAsc=!sortAsc; else{sortCol=i;sortAsc=true;} renderTable();
+  });
+  document.getElementById("meta").textContent=
+    `${rows.length} of ${DATA.length} backends · ${new Set(DATA.map(b=>b.vendor)).size} vendors · `
+    +`${cols.length} columns shown · every value links to its source`;
+}
+function sv(cell){ const v=cell.value; if(isU(v)) return sortAsc?Infinity:-Infinity;
+  return typeof v==="number"?v:String(v).toLowerCase(); }
+
+/* ============================================================
+   CHARTS
+   ============================================================ */
+// All charts are cross-sectional — one point per current backend, read straight
+// from backends.json. No time axis (collection dates are irregular & sparse).
+const PRICE_METRICS = [
+  ["per_1q_gate","Per-1Q gate"],["per_2q_gate","Per-2Q gate"],
+  ["per_shot","Per-shot"],["per_task","Per-task"],["per_iteration","Per-iteration"],
+  ["per_second","Per-second"],["per_hour","Per-hour"],
+  ["per_month","Per-month"],["per_system","Per-system"]];
+const SPECS = [
+  ["qubits","#Qubits"],["quantum_volume","Quantum Volume"],
+  ["algorithmic_qubits","Algorithmic Qubits"],["fidelity_2q_avg","2Q avg fidelity"],
+  ["theo_max_log2","Theo max log2"]];
+const PALETTE=["#6ea8fe","#3fb68b","#e0a34e","#c678dd","#e06c75","#56b6c2","#d19a66","#98c379","#61afef","#be5046"];
+
+// parse a pricing string like "USD 0.08" / "EUR 135000" -> {value, currency}
+function parsePrice(s){ if(isU(s)) return null;
+  const str=String(s); const m=str.replace(/,/g,"").match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+  if(!m) return null;
+  let cur="USD";
+  if(/EUR|€/.test(str)) cur="EUR"; else if(/GBP|£/.test(str)) cur="GBP"; else if(/USD|\$/.test(str)) cur="USD";
+  return {value:parseFloat(m[0]), currency:cur};
+}
+function priceOf(b,metric){ return parsePrice((b.pricing||{})[metric]); }
+function specOf(b,key){
+  if(key==="qubits") return num(leaf(b,"qpu_topology","qubits").value);
+  if(key==="quantum_volume") return num(prov(b,"quantum_volume").value);
+  if(key==="algorithmic_qubits") return num(prov(b,"black_box").value);
+  if(key==="fidelity_2q_avg") return num(leaf(b,"fidelity","2q_avg").value);
+  if(key==="theo_max_log2"){ const t=b.derived_metrics&&b.derived_metrics.theoretical_max;
+    return t&&t.log2_value!=null?+t.log2_value:null; }
+  return null;
+}
+function num(v){ if(isU(v)) return null; const n=typeof v==="number"?v:parseFloat(String(v).replace(/,/g,"")); return isFinite(n)?n:null; }
+function currencyOf(metric){ const c=new Set();
+  DATA.forEach(b=>{ const p=priceOf(b,metric); if(p) c.add(p.currency); }); return [...c]; }
+function metricLabel(metric){
+  const base=(PRICE_METRICS.find(x=>x[0]===metric)||[,metric])[1];
+  const cur=currencyOf(metric); return base+(cur.length?` (${cur.join("/")})`:"");
+}
+
+function fillSelectors(){
+  const m=document.getElementById("metric"); m.innerHTML=PRICE_METRICS.map(x=>`<option value="${x[0]}">${metricLabel(x[0])}</option>`).join("");
+  if(!m.value) m.value="per_shot";
+  const s=document.getElementById("spec"); s.innerHTML=SPECS.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("");
+}
+
+/* generic SVG plot. spec:{type:'line'|'scatter'|'bar', series:[{name,color,points:[{x,y,label}]}], xIsDate, logy, xTitle,yTitle, xCats?} */
+function plot(spec){
+  const W=Math.min(920, (document.getElementById("view-charts").clientWidth||900)-40), H=430;
+  const m={l:64,r:20,t:14,b:56};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const all=spec.series.flatMap(s=>s.points);
+  if(!all.length) return `<svg viewBox="0 0 ${W} ${H}"><text x="${W/2}" y="${H/2}" text-anchor="middle">No data for this selection</text></svg>`;
+  let xs=all.map(p=>p.x), ys=all.map(p=>p.y).filter(v=>v!=null && (!spec.logy || v>0));
+  let xmin=Math.min(...xs), xmax=Math.max(...xs);
+  let ymin=Math.min(...ys), ymax=Math.max(...ys);
+  const logy=spec.logy;
+  const YT=v=>logy?Math.log10(v):v;
+  let y0=logy?Math.log10(Math.max(ymin, Math.min(...ys))):Math.min(0,ymin);
+  if(logy){ y0=Math.floor(Math.log10(Math.min(...ys))); ymax=Math.pow(10,Math.ceil(Math.log10(ymax))); }
+  else { y0 = ymin<0?ymin:0; }
+  const yhi=logy?Math.log10(ymax):ymax*1.08;
+  if(spec.type==="bar"){ xmin=0; xmax=spec.series[0].points.length; }
+  const px=x=> m.l + ( (xmax===xmin?0.5:(x-xmin)/(xmax-xmin)) )*iw;
+  const py=y=>{ const t=(YT(y)-y0)/((yhi-y0)||1); return m.t+ih-(t*ih); };
+
+  let g="";
+  // y grid + labels
+  const yticks=5;
+  for(let i=0;i<=yticks;i++){ const yv= y0+(yhi-y0)*i/yticks; const yy=m.t+ih-(i/yticks)*ih;
+    let lab = logy?("1e"+round(yv)):fmtNum(yv);
+    g+=`<line x1="${m.l}" y1="${yy}" x2="${m.l+iw}" y2="${yy}" stroke="var(--grid)"/>`;
+    g+=`<text x="${m.l-8}" y="${yy+3}" text-anchor="end">${lab}</text>`; }
+  // x axis
+  if(spec.type==="bar"){
+    spec.series[0].points.forEach((p,i)=>{ const xx=m.l+(i+0.5)/spec.series[0].points.length*iw;
+      g+=`<text x="${xx}" y="${m.t+ih+14}" text-anchor="end" transform="rotate(-35 ${xx} ${m.t+ih+14})">${esc(p.label)}</text>`; });
+  } else if(spec.xIsDate){
+    const uniq=[...new Set(xs)].sort((a,b)=>a-b); let lastX=-1e9;
+    uniq.forEach((x,i)=>{ const xx=px(x);
+      if(xx-lastX<58 && i!==uniq.length-1) return;   // avoid overlapping date labels
+      lastX=xx;
+      g+=`<text x="${xx}" y="${m.t+ih+16}" text-anchor="middle">${new Date(x).toISOString().slice(0,10)}</text>`; });
+  } else {
+    const xticks=5; for(let i=0;i<=xticks;i++){ const xv=xmin+(xmax-xmin)*i/xticks; const xx=px(xv);
+      g+=`<text x="${xx}" y="${m.t+ih+16}" text-anchor="middle">${fmtNum(xv)}</text>`; }
+  }
+  g+=`<line x1="${m.l}" y1="${m.t+ih}" x2="${m.l+iw}" y2="${m.t+ih}" stroke="var(--line)"/>`;
+  g+=`<line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${m.t+ih}" stroke="var(--line)"/>`;
+  g+=`<text x="${m.l+iw/2}" y="${H-6}" text-anchor="middle">${esc(spec.xTitle||"")}</text>`;
+  g+=`<text transform="rotate(-90 14 ${m.t+ih/2})" x="14" y="${m.t+ih/2}" text-anchor="middle">${esc(spec.yTitle||"")}</text>`;
+
+  // series
+  spec.series.forEach((s,si)=>{
+    const pts=s.points.filter(p=>p.y!=null&&(!logy||p.y>0));
+    if(spec.type==="line"){
+      const dd=pts.sort((a,b)=>a.x-b.x).map((p,i)=>(i?"L":"M")+px(p.x)+" "+py(p.y)).join(" ");
+      g+=`<path d="${dd}" fill="none" stroke="${s.color}" stroke-width="2"/>`;
+      pts.forEach(p=>g+=dot(px(p.x),py(p.y),s.color,p,s.name));
+    } else if(spec.type==="scatter"){
+      pts.forEach(p=>g+=dot(px(p.x),py(p.y),s.color,p,s.name));
+    } else if(spec.type==="bar"){
+      const bw=iw/pts.length*0.6;
+      pts.forEach((p,i)=>{ const xx=m.l+(i+0.5)/pts.length*iw; const yy=py(p.y);
+        g+=`<rect x="${xx-bw/2}" y="${yy}" width="${bw}" height="${m.t+ih-yy}" fill="${s.color}" rx="2"
+             data-t="${esc(p.tip||p.label+': '+fmtNum(p.y))}" class="pt"/>`; });
+    }
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`;
+}
+function dot(x,y,c,p,series){ return `<circle cx="${x}" cy="${y}" r="4" fill="${c}" class="pt"
+  data-t="${esc((p.label?p.label+' · ':'')+(series?series+' · ':'')+fmtNum(p.y)+(p.xlab?(' @ '+p.xlab):''))}"/>`; }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+function fmtNum(v){ if(v==null) return "—"; const a=Math.abs(v);
+  if(a!==0&&(a<0.001||a>=1e6)) return v.toExponential(2);
+  return (Math.round(v*1000)/1000).toLocaleString(); }
+
+function dominantCurrency(metric){
+  const cnt={}; DATA.forEach(b=>{ const p=priceOf(b,metric); if(p) cnt[p.currency]=(cnt[p.currency]||0)+1; });
+  const e=Object.entries(cnt).sort((a,z)=>z[1]-a[1]); return e.length?e[0][0]:"USD";
+}
+function excludedNote(metric,cur){
+  const other=DATA.map(b=>priceOf(b,metric)).filter(p=>p&&p.currency!==cur).length;
+  return other?` ${other} value(s) in another currency are hidden to avoid mixing units.`:"";
+}
+function renderChart(){
+  const type=document.getElementById("chartType").value;
+  const metric=document.getElementById("metric").value;
+  const specK=document.getElementById("spec").value;
+  const divK=document.getElementById("divisor").value;
+  const logy=document.getElementById("logy").checked;
+  document.getElementById("sLbl").classList.toggle("hidden", type!=="scatter");
+  document.getElementById("spec").classList.toggle("hidden", type!=="scatter");
+  document.getElementById("dLbl").classList.toggle("hidden", type!=="efficiency");
+  document.getElementById("divisor").classList.toggle("hidden", type!=="efficiency");
+  const base=(PRICE_METRICS.find(x=>x[0]===metric)||[,metric])[1];
+  const cur=dominantCurrency(metric);          // one currency per chart, never mixed
+  const mName=`${base} (${cur})`;
+  const sName=(SPECS.find(x=>x[0]===specK)||[])[1];
+  const dName=(SPECS.find(x=>x[0]===divK)||[])[1];
+  const priced=b=>{ const p=priceOf(b,metric); return (p&&p.currency===cur)?p:null; };
+  let spec, title, note;
+
+  if(type==="scatter"){
+    // one point per backend: X = chosen spec, Y = chosen price metric
+    const pts=[];
+    DATA.forEach(b=>{ const p=priced(b); const xv=specOf(b,specK);
+      if(p&&xv!=null) pts.push({x:xv, y:p.value, label:b.backend_name, xlab:sName+" "+fmtNum(xv)}); });
+    title=`${mName} vs ${sName}`;
+    note=`One point per backend, current snapshot (${pts.length} priced in ${cur}).`+excludedNote(metric,cur)+` Hover for the backend.`;
+    spec={type:"scatter", logy, xTitle:sName, yTitle:mName, series:[{name:sName, color:"#6ea8fe", points:pts}]};
+  }
+  else if(type==="efficiency"){
+    // price ÷ capability, one bar per backend, sorted cheapest→dearest
+    const rows=[];
+    DATA.forEach(b=>{ const p=priced(b); const d=specOf(b,divK);
+      if(p&&d) rows.push({label:b.backend_name, y:p.value/d,
+        tip:`${b.backend_name}: ${fmtNum(p.value/d)} ${cur}/${dName}`}); });
+    rows.sort((a,z)=>a.y-z.y);
+    title=`${mName} per ${dName} — cost-efficiency`;
+    note=`Lower is better: price ÷ capability. Only backends publishing both ${base} (${cur}) and ${dName} appear (${rows.length}).`+excludedNote(metric,cur);
+    spec={type:"bar", logy, xTitle:"", yTitle:`${cur} / ${dName}`, series:[{name:"eff", color:"#3fb68b", points:rows}]};
+  }
+  else { // pricebar : the chosen price metric per backend, sorted
+    const rows=[];
+    DATA.forEach(b=>{ const p=priced(b); if(p) rows.push({label:b.backend_name, y:p.value,
+      tip:`${b.backend_name}: ${fmtNum(p.value)} ${cur}`}); });
+    rows.sort((a,z)=>a.y-z.y);
+    title=`${mName} by backend`;
+    note=`Every backend publishing ${base} in ${cur} (${rows.length}), cheapest first.`+excludedNote(metric,cur);
+    spec={type:"bar", logy, xTitle:"", yTitle:mName, series:[{name:"price", color:"#6ea8fe", points:rows}]};
+  }
+
+  document.getElementById("chTitle").textContent=title;
+  document.getElementById("chNote").textContent=note;
+  document.getElementById("chart").innerHTML=plot(spec);
+  document.getElementById("legend").innerHTML="";
+  wireTips();
+}
+function wireTips(){
+  const tip=document.getElementById("tip");
+  document.querySelectorAll("#chart .pt").forEach(el=>{
+    el.addEventListener("mousemove",e=>{ tip.style.display="block"; tip.textContent=el.dataset.t;
+      tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY+12)+"px"; });
+    el.addEventListener("mouseleave",()=>tip.style.display="none");
+  });
+}
+
+/* ---------- view switching + loading ---------- */
+function showTab(which){
+  const t=which==="table";
+  document.getElementById("tab-table").classList.toggle("active",t);
+  document.getElementById("tab-charts").classList.toggle("active",!t);
+  document.getElementById("view-table").classList.toggle("hidden",!t);
+  document.getElementById("groups").classList.toggle("hidden",!t);
+  document.getElementById("view-charts").classList.toggle("hidden",t);
+  if(!t) renderChart();
+}
+document.getElementById("tab-table").onclick=()=>showTab("table");
+document.getElementById("tab-charts").onclick=()=>showTab("charts");
+["chartType","metric","spec","divisor","logy"].forEach(id=>document.getElementById(id).addEventListener("change",renderChart));
+document.getElementById("q").addEventListener("input",renderTable);
+
+function loadData(arr,name){
+  if(!Array.isArray(arr)){ alert("Expected a JSON array of backend objects."); return; }
+  DATA=arr;
+  document.getElementById("drop").classList.add("hidden");
+  document.getElementById("groups").classList.remove("hidden");
+  document.getElementById("view-table").classList.remove("hidden");
+  document.getElementById("subtitle").textContent=(name||"loaded")+" · "+DATA.length+" backends";
+  renderGroups(); renderTable(); fillSelectors();
+}
+document.getElementById("file").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return;
+  f.text().then(t=>loadData(JSON.parse(t), f.name));
+});
+const drop=document.getElementById("drop");
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("hot");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("hot");}));
+drop.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) f.text().then(t=>loadData(JSON.parse(t),f.name)); });
+
+fillSelectors();
+// auto-load when served over http(s)
+(function auto(){
+  if(location.protocol==="file:") return;
+  fetch("data/backends.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(j) loadData(j,"data/backends.json"); }).catch(()=>{});
+})();
+</script>
+</body>
+</html>

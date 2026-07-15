@@ -1,0 +1,91 @@
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Availibility Impact Factors;"Op. Speed, Downtime, ...
+
+";;;;; max(1QG/sec*$/1QG, 2QG/sec*$/2QG, Circuits/Sec, It/Sec,Shots/Sec,Cost/year*months/year) ;;;;;;
+;;;;Backend name;;;Quantum Volume;;;;Algorithmic Qubits;QPU Topology;;;Fidelity;;;;;;;Operation Speed;;;;;;;;;;Features;;;;;;Pricing;;;;;;;;;;;
+ID ;Type;Vendor;Model;System Name;(Planned) Release;Commercial Release;Black-box;Argmax;Vendor;Theo Max. 2^min(#Qubits, 1/avg 2Q infid));b;#Qubits;Type/ Topology;#Edges;2Q gate (max;2Q gate (avg or median);2Q gate (min);1Q gate (max);1Q gate (avg);1Q gate (min);SPAM (avg);1Q gate time (s);2Q gate time (s);ReadOut Time;Shot Rep. Rate min. (Hz);Shot Rep. Rate avg. (Hz);Shot Rep. Rate max (Hz);CLOPS (Hz);Credits/Hour;Tech. Date retrieved;Tech. Source;Mid-circuit Measurement;MCM with conditional logic;Parallel two-qubit operations;Qubit reuse;Hybrid (classical+quantum);Uptime;Per-1Q-Gate price (ct);Per-2Q-Gate price (ct);Per-Iteration price (ct);Per-shot price (ct);Per-task price (ct); Price-per-second ; Price-per-hour ; Price-per-month (dedicated?) ; Price-per-System ;Price Date retrieved;Price Source;Comment
+12;IT-mw;eleQtron;Sapphire Gen. III;;;no;;;;2E+90;;300;;;;99,95%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+40;SC;IBM; Eagle r3 ;ibm_sherbrooke;;;;;1E+02;1E+35;;127; Eagle r3 ;;;99,14%;;;99,91%;;;2,5E-08;;;;;;1,5E+05;;31.07.2024;https://en.wikipedia.org/wiki/List_of_quantum_processors;;;;;;;;;;;;; 5.760,00 € ;;;;https://www.ibm.com/quantum/pricing#compare-features;so it is not specified anymore what system you get access to, it is dependent ton your location.
+43;SC;IQM;radiance;n/a;;no;;;;#DIV/0!;;150;;;99,40%;#DIV/0!;;;;;;;;;;;;;;07.04.2025;https://quantumcomputingreport.com/iqm-receives-a-e25-million-27-1m-usd-purchase-order-for-two-advanced-quantum-computers-for-euro-q-exa-hybrid-system/;;;;;;;;;;;;;;;#DIV/0!;;;
+14;SC;Google ;Willow;Willow;;no;;;;4E+31;;105;4-way;364,35;;99,67%;;;99,97%;;99,23%;;;;;6,3E+04;;;;10.10.2025;https://quantumai.google/static/site-assets/downloads/willow-spec-sheet.pdf;;;;;;;;;;;;;;;;;;
+11;IT-mw;eleQtron (Team);Sapphire Gen. II;;;no;;;;1E+30;;100;;;;99,95%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+72;SCIT-L;Rigetti;Ankaa-3;Ankaa-3;2024;yes;;;;2E+25;;84;Superconducting transmons, square lattice with tunable couplers;140;99,50%;99,00%;;;99,90%;;;;7,2E-08;;;;;;;;;;;;;;;;;;;;;;;;;rigetti;
+10;IT-mw;eleQtron;Sapphire Gen. I;;;no;;;;1E+18;;60;;;;99,90%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+28;SC;IBM;Eagle;ibmq_washington;;yes;8E+00;2E+01;6E+01;3E+17;;127;Eagle rl;142;;98,28%;;;99,97%;;97,37%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+57;IT-l;Quantinuum;H2;H2-1;2024;yes;;;8E+06;7E+16;;56;All-to-All;1596;99,87%;99,85%;99,70%;100,00%;100,00%;99,98%;99,85%;;5,0E-04;;1,5E+00;;1,2E+01;;;31.07.2024;https://assets.website-files.com/62b9d45fb3f64842a96c9686/665f5f7c23a198115c253529_Quantinuum%20H1%20Product%20Data%20Sheet%20V6.1%2004Jun24.pdf;yes;yes;4;yes;;;0,18;1,80;;3,51;;;; 135.000,00 € ;;31.07.2024;https://learn.microsoft.com/en-us/azure/quantum/pricing?tabs=tabid-paygo%2Ctabid-AQcreditsPasqal%2Ctabid-standard-H1%2Ctabid-AQcreditsRigetti;
+42;SC;IQM;radiance;Emerald ;;no;;;;#DIV/0!;;54;;;99,20%;#DIV/0!;;;;;;;;;;;;;;07.04.2025;https://quantumcomputingreport.com/iqm-receives-a-e25-million-27-1m-usd-purchase-order-for-two-advanced-quantum-computers-for-euro-q-exa-hybrid-system/;;;;;;;;;;;;;;;#DIV/0!;;;
+71;SCIT-L;IQM;Radiance;Emerald ;2024;yes;;;;2E+16;;54;Superconducting transmon, square lattice;90;99,85%;99,50%;99,00%;99,90%;99,90%;99,70%;97,00%;4,0E-08;6,0E-08;1,0E-06;;;;;;;;;;;;;;;;;0,00;0,30;; 4.000,00 € ;;;;aws bracket;
+13;SC;Google ;Sycamore;Sycamore;;no;;;;9E+15;;53;Square Lattice NN;;99,30%;99,10%;98,10%;99,00%;99,00%;98,00%;95,00%;2,5E-08;3,0E-08;4,0E-06;1,0E+03;2,5E+03;1,5E+04;;;31.07.2024;https://quantumai.google/hardware/datasheet/weber.pdf;;;;;;;;;;101,55;;;;;;;;
+9;IT-mw;eleQtron (Team);Ruby Gen. III;;;no;;;;1E+12;;40;;;;99,50%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+46;IT-l;IonQ ;Forte;ionq_forte;2023;yes;;;;7E+10;35;36;All-to-All;666;;99,60%;;;99,98%;;99,50%;;5,0E-04;;;0,0E+00;;;;;;;;;;;;0,022;0,0975;;;;;;;;31.07.2024;"
+https://learn.microsoft.com/en-us/azure/quantum/pricing?tabs=tabid-paygo%2Ctabid-AQcreditsPasqal%2Ctabid-AQcreditsQ%2Ctabid-AQcreditsRigetti 
+https://aws.amazon.com/braket/pricing/";
+60;IT-l;QCWare Forge IonQ;Forte;Forte?;;yes;;;;7E+10;;36;All-to-All;666;;99,60%;;;99,98%;;;;;;;;;;;;;;;;;;;;;;;;; 15.000,00 € ;;;31.07.2024;https://forge.qcware.com/pricing/;
+50;IT-l;OQC;;Toshiko;;2023;;;;4E+09;;32;;;;99,00%;;;99,90%;;;;2,5E-08;;;;;;;;;;;;;;;;;;;;;;;;;;
+26;SC;IBM;Falcon;ibmq_toronto;;yes;8E+00;2E+01;3E+01;1E+08;;27;Falcon r4;28;;97,87%;;;99,93%;;93,76%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+30;SC;IBM;Falcon;ibmq_cairo;;yes;8E+00;2E+01;6E+01;1E+08;;27;Falcon r5.11;28;;98,82%;;;99,98%;;98,07%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+31;SC;IBM;Falcon;ibmq_hanoi;;yes;8E+00;3E+01;6E+01;1E+08;;27;Falcon r5.11;28;;98,91%;;;99,98%;;97,78%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+33;SC;IBM;Falcon;ibmq_montreal;;yes;8E+00;3E+01;1E+02;1E+08;;27;Falcon r4;28;;98,58%;;;99,96%;;97,69%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+45;IT-l;IonQ;Aria;;;2022;;;1E+06;3E+07;20;25;All-to-All;325;;99,40%;;;99,94%;;;;;;;6,5E+01;;;;;;;;;;;;0,022;0,0975;;3,00;30,00;; 7.000,00 € ;;;30.04.2024;"
+https://learn.microsoft.com/en-us/azure/quantum/pricing?tabs=tabid-paygo%2Ctabid-AQcreditsPasqal%2Ctabid-AQcreditsQ%2Ctabid-AQcreditsRigetti 
+https://aws.amazon.com/braket/pricing/";
+66;IT-l;AQT;Pine;Pine;;;;;1E+02;2E+07;;24;;;;99,22%;;;;;;;;;;;;;;25.07.2025;https://www.aqt.eu/press/;;;;;;;;;;;;;;;;;;
+67;IT-l;AQT;-;AQTION Project System;-;no;;;;2E+07;;24;;;;99,70%;;;99,99%;;99,90%;;;;;;;;;10.10.2025;I. Pogorelov, et al., PRX Quantum 2, 020343 (2021) https://doi.org/10.1103/PRXQuantum.2.020343;;;;;;;;;;;;;;;;;;
+29;SC;IBM;Falcon;ibmq_auckland;;yes;8E+00;2E+01;6E+01;3E+06;;27;Falcon r5.11;28;;95,36%;;;99,92%;;98,72%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+32;SC;IBM;Falcon;ibmq_mumbai;;yes;8E+00;2E+01;1E+02;1E+06;;27;Falcon r5.1;28;;95,04%;;;99,94%;;97,20%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+8;IT-mw;eleQtron;Ruby Gen. II;;;no;;;;1E+06;;20;;;;99,00%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+41;SC;IQM;radiance;Garnet;;yes;;;2E+01;1E+06;;20;Square Lattice NN;31;99,85%;99,50%;;99,94%;99,91%;;;4,0E-08;6,0E-08;;;;;2,6E+03;;22.08.2024;arxiv;;;;;;;;;;0,00;0,30;; 3.000,00 € ;;;;aws bracket;
+56;IT-l;Quantinuum;H1;H1;;yes;;;1E+06;1E+06;;20;All-to-All;210;99,92%;99,90%;99,70%;100,00%;100,00%;99,98%;99,91%;;;;1,5E+00;;1,2E+01;1,0E+02;1,0E+03;31.07.2024;https://assets.website-files.com/62b9d45fb3f64842a96c9686/665f5f7c23a198115c253529_Quantinuum%20H1%20Product%20Data%20Sheet%20V6.1%2004Jun24.pdf;yes;no;5;no;;;0,18;1,80;;3,51;;;; 135.000,00 € ;;31.07.2024;https://learn.microsoft.com/en-us/azure/quantum/pricing?tabs=tabid-paygo%2Ctabid-AQcreditsPasqal%2Ctabid-standard-H1%2Ctabid-AQcreditsRigetti;10k HQCredits
+25;SC;IBM;Falcon;ibmq_sydney;;yes;8E+00;2E+01;3E+01;7E+05;;27;Falcon r4;28;;94,87%;;;99,97%;;95,70%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+24;SC;IBM;Falcon;ibmq_guadalupe;;yes;8E+00;3E+01;3E+01;7E+04;;16;Falcon r4P;16;;98,92%;;;99,97%;;97,38%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+53;SC;Rigetti;Aspen;Aspen- 11;;yes;< 2;4E+00;8E+00;7E+03;;38;Octagonal;43;;92,15%;;;99,55%;;96,78%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03839;;;;;;;;;;;;;;;;;;
+55;IT-l;Quantinuum;H1;H1-2;;yes;512 *;512 *;4E+03;4E+03;;12;All-to-All;66;;99,50%;;;99,97%;;99,30%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+27;SC;IBM;Hummingbird;ibmq_brooklyn;;yes;8E+00;3E+01;3E+01;3E+03;;65;Hummingbird r2;72;;91,18%;;;99,95%;;96,94%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+54;SC;Rigetti;Aspen;Aspen-M-1;;yes;< 2;8E+00;8E+00;2E+03;;80;Octagonal;102;;91,13%;;;98,94%;;96,95%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03840;;;;;;;;;;0,04;30,00;;;;;30.04.2024;;
+44;IT-l;IonQ;Harmony;;;2022;8E+00;8E+00;5E+02;2E+03;9;11;All-to-All;55;;96,54%;;;99,72%;;99,71%;;;;;#DIV/0!;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;0,003;0,030;;1,00;30,00;;#DIV/0!;;;30.04.2024;https://aws.amazon.com/braket/pricing/;
+2;IT-mw;eleQtron;Ruby Gen. I;Ruby (Design Specs);;no;;;;1E+03;;10;All-to-All;55;;99,00%;;;99,90%;;97,30%;;2,5E-02;;;;;;;09.02.2025;;;;;;;;;;;;;;;;;;;
+52;SC;Rigetti;;Novera ANKAA-9Q-1;;yes;;;;5E+02;;9;Octagonal;12;;98,50%;;;99,90%;;;;;;;;;;;14.01.2025;https://www.rigetti.com/novera;;;;;;;;;;;;;;; 900.000,00 € ;14.01.2024;https://www.rigetti.com/novera;
+49;IT-l;OQC;;Lucy;;2022;< 2;< 2;;3E+02;;8;LNN ring;8;;94,16%;;;99,91%;;90,44%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03838;;;;;;;;;;0,04;30,00;;;;;30.04.2024;;
+18;SC;IBM;Falcon;ibmq_jakarta;;yes;8E+00;8E+00;2E+01;1E+02;;7;Falcon r5.11H;6;;98,96%;;;99,97%;;97,47%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+21;SC;IBM;Falcon;ibmq_perth;;yes;8E+00;8E+00;3E+01;1E+02;;7;Falcon r5.11H;6;;97,81%;;;99,97%;;98,70%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+22;SC;IBM;Falcon;ibmq_casablanca;;yes;8E+00;2E+01;3E+01;1E+02;;7;Falcon r4H;6;;99,03%;;;99,98%;;98,05%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+23;SC;IBM;Falcon;ibmq_lagos;;yes;8E+00;3E+01;3E+01;1E+02;;7;Falcon r5.11H;6;;99,24%;;;99,98%;;98,62%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+15;SC;IBM;Falcon;ibmq_lima;;yes;8E+00;8E+00;8E+00;3E+01;;5;Falcon r4T;4;;98,98%;;;99,98%;;97,30%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;; 1,60 € ;;;;31.07.2024;https://www.ibm.com/quantum/pricing;
+16;SC;IBM;Falcon;ibmq_belem;;yes;8E+00;8E+00;2E+01;3E+01;;5;Falcon r4T;4;;98,74%;;;99,98%;;97,75%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+17;SC;IBM;Falcon;ibmq_quito;;yes;8E+00;2E+01;2E+01;3E+01;;5;Falcon r4T;4;;98,89%;;;99,98%;;97,17%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+19;SC;IBM;Falcon;ibmq_manila;;yes;2E+01;2E+01;3E+01;3E+01;;5;Falcon r5.11L;4;;98,97%;;;99,97%;;97,28%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+20;SC;IBM;Falcon;ibmq_bogota;;yes;8E+00;8E+00;3E+01;3E+01;;5;Falcon r4L;4;;99,05%;;;99,98%;;96,56%;;;;;;;;;30.03.2022;https://arxiv.org/pdf/2203.03816;;;;;;;;;;;;;;;;;;
+3;IT-mw;eleQtron;Ruby;Ruby QSea I;;no;;;;2E+01;;4;All-to-All;10;;96,00%;;;99.96%;;;;2,5E-02;;7,3E-01;6,6E-01;1,3E+00;;;02.10.2025;benchmark as QFT basis 8.10.25, eleQtron internal document, QSea I: Work Package 1.1 Micromilestone 1.4 (version 09.02.2025);;;;;;;;;;;;;;;;;;
+65;IT-MW;Oxford Ionics;;-;-;no;;;;4E+00;;2;;;;99,97%;;;100,00%;;100,00%;;;;;;;;;10.10.2025;C. M. Löschnauer, et al., arXiv:2407.07694 (2024) https://doi.org/10.48550/arXiv.2407.07694;;;;;;;;;;;;;;;;;;
+69;IT-l;Universal Quantum;-;-;;;;;;4E+00;;2;;;;98,50%;;;99,99%;;;;;;;;;;;10.10.2025;J. Randall, et al., Phys. Rev. A 98, 043414 (2018) [DOI: 10.1103/PhysRevA.98.043414] ;;;;;;;;;;;;;;;;;;
+1;IT-mw;eleQtron (EQO);-;-;-;no;;;;2E+00;;8;;;;;;;99,96%;;98,00%;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+34;SC;IBM;Hummingbird;-;;yes;;;1E+02;2E+00;;;Hummingbird r3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+47;IT-l;IonQ;Tempo;;;no;;;;2E+00;64;;;;;;;;;;;3,0E-04;;;;;;;;;;;;;;;95%;;;;;;;;;;;;
+48;IT-l;IonQ;;all?;;yes;;;;2E+00;;;All-to-All;;;;;;;;;;;;;;;;;;;;;;;;;0,003;0,030;100,00;;;;;;;31.07.2024;https://ionq.com/programs/research-credits/resource-estimator;
+51;NA;Pasqal;;Fresnel1;;yes;;;;2E+00;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 3.000,00 € ;;;31.07.2024;https://learn.microsoft.com/en-us/azure/quantum/pricing?tabs=tabid-paygo%2Ctabid-AQcreditsPasqal%2Ctabid-AQcreditsQ%2Ctabid-AQcreditsRigetti;
+58;NA;QuEra;Aquila;Aquila;;yes;;;;2E+00;;336;;;;;;;;;;;1,6E-06;;;;;;;;;;;;;;;;;;1,00;30,00;;;;;30.04.2024;https://aws.amazon.com/braket/pricing/;
+59;QEm;QCWare Forge avg.;;;;yes;;;;2E+00;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 2.500,00 € ;;;31.07.2024;https://forge.qcware.com/pricing/;
+61;SC;QCWare Forge Rigetti;;?;;yes;;;;2E+00;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 5.000,00 € ;;;31.07.2024;https://forge.qcware.com/pricing/;
+62;QEm;QC Ware Forge NVIDIA;;GPU;;yes;;;;2E+00;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 100,00 € ;;;31.07.2024;https://forge.qcware.com/pricing/;
+63;IT-mw;Qudora;;XAPHIRO;;no;;;;2E+00;;1;;;;;;;;;;;;;;;;;;;https://www.linkedin.com/posts/qudora_quantumcomputing-trappedions-quantumtechnology-ugcPost-7335963491381530624-7eOz?utm_source=share&utm_medium=member_desktop&rcm=ACoAABXxc-cB6W_-crNGcjaRrFG3vTvvMJPi-BE;;;;;;;;;;;;;;;;;;
+64;IT-l;NeQxt;;;;;;;;2E+00;;;;;;;;;;;;n/a;>0,0005;;;;;;;;;n/a;n/a;;;;;;;;;;;;;;;;
+68;NA;Atom;;;;;;;;2E+00;;118;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+4;IT-mw;eleQtron;Emerald;Emerald QSea II ;;no;;;;1E+00;;0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+5;IT-mw;eleQtron;Ruby;Ruby EPIQ I.1;;no;;;;1E+00;;0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+6;IT-mw;eleQtron;Ruby;Ruby EPIQ I.2;;no;;;;1E+00;;0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+7;IT-mw;eleQtron (Team);-;Uni Siegen System;;no;;;;1E+00;;0;;;;98,00%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+35;SC;IBM; Heron r2 ;ibm_kingston;;;;;5E+02;;;156; Heron r2 ;;99,91%;-;;;;;;2,5E-08;;;;;;2,5E+05;;;;;;;;;;;;;;;; 5.760,00 € ;;;;https://www.ibm.com/quantum/pricing#compare-features;so it is not specified anymore what system you get access to, it is dependent ton your location.
+36;SC;IBM; Heron r2 ;ibm_fez;;;;;5E+02;;;156; Heron r2 ;;99,86%;-;;;;;;2,5E-08;;;;;;2,0E+05;;;;;;;;;;;;;;;; 5.760,00 € ;;;;https://www.ibm.com/quantum/pricing#compare-features;so it is not specified anymore what system you get access to, it is dependent ton your location.
+37;SC;IBM; Heron r2 ;ibm_marrakesh;;;;;5E+02;;;156; Heron r2 ;;99,88%;-;;;;;;2,5E-08;;;;;;2,0E+05;;;;;;;;;;;;;;;; 5.760,00 € ;;;;https://www.ibm.com/quantum/pricing#compare-features;so it is not specified anymore what system you get access to, it is dependent ton your location.
+38;SC;IBM; Heron r1 ;ibm_torino;;;;;;;;133; Heron r1 ;;99,85%;-;;;;;;2,5E-08;;;;;;2,1E+05;;;;;;;;;;;;;;;; 5.760,00 € ;;;;https://www.ibm.com/quantum/pricing#compare-features;so it is not specified anymore what system you get access to, it is dependent ton your location.
+39;SC;IBM; Eagle r3 ;ibm_brisbane;;;;;1E+02;;;127; Eagle r3 ;;99,72%;-;;;;;;2,5E-08;;;;;;1,8E+05;;;;;;;;;;;;;;;; 5.760,00 € ;;;;https://www.ibm.com/quantum/pricing#compare-features;so it is not specified anymore what system you get access to, it is dependent ton your location.
+70;SC-QA;DWAVE system;Advantage2;Advantage2 tm Quantum computer;2023;yes;;;;;;4400;Zephyr;40000 couplers;;;;;;;;;;(100-200)E-04;;;;;;;;;;;;;;;;;;;; 2.000,00 € ;;;;;Free tier available (1 min QPU time, followed by an agreement with DWAVE) hence, not publicly disclosed, price is based on the first version of leap (not leap2) which had this pricing: https://venturebeat.com/business/d-wave-announces-leap-2-its-cloud-service-for-quantum-computing-applications
+73;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+74;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+75;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+76;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+77;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+78;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+79;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+80;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+81;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+82;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

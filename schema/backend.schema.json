@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://elqtron.local/schema/backend.schema.json",
+  "title": "Commercial Quantum Backend Record",
+  "description": "Investor-grade record for a single commercially available or announced quantum computing backend. Every numeric value is expected to be traceable via the `sources` array. Unknown values MUST be the string 'Not publicly disclosed', never invented.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["backend_name", "vendor", "sources"],
+  "definitions": {
+    "provValue": {
+      "description": "A value carrying its own provenance.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {},
+        "source": { "type": "string", "description": "Canonical source URL for this value." },
+        "retrieved": { "type": "string", "description": "ISO-8601 date/time the value was retrieved." },
+        "method": {
+          "type": "string",
+          "description": "How the value was obtained.",
+          "enum": ["measured", "maximum", "average", "median", "minimum", "theoretical", "benchmark-derived", "vendor-spec", "computed", "publication", ""]
+        },
+        "kind": {
+          "type": "string",
+          "description": "Whether the value is a direct vendor spec, from a calibration API, or from a publication.",
+          "enum": ["vendor", "calibration-api", "cloud-api", "publication", "conference", "third-party", "computed", "config-asserted", ""]
+        }
+      }
+    },
+    "unknown": {
+      "description": "Placeholder for values that could not be found.",
+      "const": "Not publicly disclosed"
+    }
+  },
+  "properties": {
+    "id": { "type": "string", "description": "Stable identifier for this backend; derived from vendor+backend_name when not set explicitly." },
+    "backend_name": { "type": "string" },
+    "vendor": { "type": "string" },
+    "type": { "type": "string", "description": "System class, e.g. 'gate-based (trapped-ion)', 'gate-based (superconducting)', 'annealer (superconducting)', 'analog (neutral-atom)'." },
+    "model": { "type": "string" },
+    "system_name": { "type": "string" },
+    "planned_release": { "type": "string" },
+    "commercial_release": { "type": "string" },
+
+    "quantum_volume": { "$ref": "#/definitions/provValue" },
+
+    "black_box": {
+      "description": "Black-box benchmark capability score (e.g. algorithmic qubits / #AQ, application benchmark). Define per record what was measured via `method`.",
+      "$ref": "#/definitions/provValue"
+    },
+    "argmax": {
+      "description": "Best single reported headline metric the vendor leads with, verbatim (e.g. '#AQ 64', 'QV 2^20'). Used for quick comparison only.",
+      "$ref": "#/definitions/provValue"
+    },
+    "vendor_metric": {
+      "description": "The vendor's own preferred figure of merit and its value (e.g. IonQ Algorithmic Qubits, IBM Quantum Volume/CLOPS, Quantinuum Quantum Volume).",
+      "$ref": "#/definitions/provValue"
+    },
+    "theoretical_max": {
+      "description": "Derived headroom metric. See derived_metrics.theoretical_max for the reproducible inputs and formula; this field mirrors the numeric value with provenance kind='computed'.",
+      "$ref": "#/definitions/provValue"
+    },
+
+    "qpu_topology": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "qubits": {},
+        "type": { "type": "string", "description": "e.g. heavy-hex, all-to-all, square-lattice, linear, reconfigurable-neutral-atom" },
+        "edges": {}
+      }
+    },
+
+    "fidelity": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "2q_max": {}, "2q_avg": {}, "2q_median": {}, "2q_min": {},
+        "1q_max": {}, "1q_avg": {}, "1q_min": {},
+        "spam_avg": {}
+      }
+    },
+
+    "operation_speed": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "1q_gate_time_s": {}, "2q_gate_time_s": {}, "readout_time_s": {},
+        "shot_rate_min": {}, "shot_rate_avg": {}, "shot_rate_max": {},
+        "clops": {}, "credits_per_hour": {}
+      }
+    },
+
+    "features": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "mid_circuit_measurement": {}, "conditional_logic": {}, "parallel_2q": {},
+        "qubit_reuse": {}, "hybrid_execution": {}, "uptime": {}
+      }
+    },
+
+    "pricing": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "per_1q_gate": {}, "per_2q_gate": {}, "per_iteration": {}, "per_shot": {},
+        "per_task": {}, "per_second": {}, "per_hour": {}, "per_month": {},
+        "per_system": {}, "comments": {}
+      }
+    },
+
+    "derived_metrics": {
+      "type": "object",
+      "description": "Values computed by this pipeline, with reproducible inputs.",
+      "additionalProperties": true,
+      "properties": {
+        "theoretical_max": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "value": {},
+            "log2_value": {},
+            "formula": { "type": "string" },
+            "inputs": { "type": "object" },
+            "caveat": { "type": "string" }
+          }
+        },
+        "fidelity_stats": {
+          "type": "object",
+          "description": "Populated only when the vendor exposes per-gate calibration data.",
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "url", "retrieved"],
+        "properties": {
+          "field": { "type": "string", "description": "Dotted path of the field this source backs, e.g. 'fidelity.2q_avg'." },
+          "url": { "type": "string" },
+          "retrieved": { "type": "string" },
+          "kind": { "type": "string" }
+        }
+      }
+    },
+
+    "_meta": {
+      "type": "object",
+      "description": "Pipeline bookkeeping.",
+      "additionalProperties": true
+    }
+  }
+}

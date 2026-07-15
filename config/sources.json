@@ -1,0 +1,636 @@
+{
+  "_readme": "Source registry for qscrape. Entries hold EXTRACTION INSTRUCTIONS, never values, EXCEPT 'const' rules which are facts verified by hand against the named 'source' (used when the value lives in a JS-rendered page or PDF the stdlib fetcher cannot read). Every const carries an explicit source URL + method. Order of api_sources then spec_sources sets merge priority. Retrieval date is stamped at run time. Values verified 2026-07-06.",
+  "cache_max_age": 86400,
+  "request_delay": 1.0,
+  "api_sources": {
+    "ibm": {
+      "enabled": true,
+      "emit_skips": true,
+      "backends": [],
+      "_note": "Set IBM_QUANTUM_TOKEN (or api_sources.ibm.token) + `pip install qiskit-ibm-runtime` for LIVE per-gate calibration: qubits, coupling-map edges, 1Q/2Q/SPAM fidelity stats, 1Q/2Q gate times, readout time, processor model, and Quantum Volume. Runs first, so its live values supersede the cited-const IBM entry and the CSV rows on merge. Optional 'backends' list restricts which devices are pulled (empty = all operational)."
+    },
+    "braket": {
+      "enabled": true,
+      "emit_skips": true,
+      "device_arns": [],
+      "_note": "`pip install amazon-braket-sdk` + AWS creds. Auto-discovers IonQ, Rigetti, IQM, QuEra device docs incl. live fidelities; supersedes their cited-const entries when live."
+    }
+  },
+  "spec_sources": [
+    {
+      "vendor": "quantinuum",
+      "tier": "vendor",
+      "backend_name": "Quantinuum H2-1",
+      "meta": {
+        "system_name": "H2",
+        "model": "H2-1",
+        "commercial_release": "2023",
+        "type": "gate-based (trapped-ion, QCCD)"
+      },
+      "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
+      "_status": "JS-RENDERED: values are cited const, verified 2026-07-06.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 56,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "qpu_topology.type": {
+          "const": "linear-trap QCCD (all-to-all)",
+          "method": "vendor-spec",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "fidelity.2q_min": {
+          "const": 0.999,
+          "as": "float",
+          "method": "minimum",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "fidelity.1q_min": {
+          "const": 0.9999,
+          "as": "float",
+          "method": "minimum",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "fidelity.2q_median": {
+          "const": 0.9987,
+          "as": "float",
+          "method": "median",
+          "source": "https://docs.quantinuum.com/systems/user_guide/hardware_user_guide/benchmarks/system_benchmarks.html"
+        },
+        "fidelity.1q_avg": {
+          "const": 0.99997,
+          "as": "float",
+          "method": "median",
+          "source": "https://docs.quantinuum.com/systems/user_guide/hardware_user_guide/benchmarks/system_benchmarks.html"
+        },
+        "quantum_volume": {
+          "const": 33554432,
+          "as": "int",
+          "method": "measured",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "features.mid_circuit_measurement": {
+          "const": "yes",
+          "method": "vendor-spec",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "features.qubit_reuse": {
+          "const": "yes",
+          "method": "vendor-spec",
+          "source": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2"
+        },
+        "pricing.per_iteration": {
+          "const": "priced per HQC (Hardware Quantum Credit)",
+          "method": "vendor-spec",
+          "source": "https://www.quantinuum.com/glossary-item/hardware-quantum-credits-hqcs"
+        },
+        "pricing.comments": {
+          "const": "Usage billed in Hardware Quantum Credits: HQC = 5 + C*(N1q + 10*N2q + 5*Nm)/5000. Standard/Premium subscriptions + pay-as-you-go per HQC. Via Azure Quantum roughly $500 per 40 HQC; direct rates via Quantinuum sales.",
+          "method": "vendor-spec",
+          "source": "https://www.quantinuum.com/glossary-item/hardware-quantum-credits-hqcs"
+        }
+      }
+    },
+    {
+      "vendor": "ionq",
+      "tier": "vendor",
+      "backend_name": "IonQ Forte",
+      "meta": {
+        "system_name": "Forte",
+        "model": "Forte",
+        "commercial_release": "2023",
+        "type": "gate-based (trapped-ion)"
+      },
+      "url": "https://ionq.com/quantum-systems/forte",
+      "_status": "VALIDATED 2026-07-06 (live regex scrape works for qubits & 2Q error).",
+      "fields": {
+        "qpu_topology.qubits": {
+          "regex": "(\\d+)\\s*qubits",
+          "as": "int",
+          "method": "vendor-spec"
+        },
+        "qpu_topology.type": {
+          "const": "all-to-all",
+          "method": "vendor-spec"
+        },
+        "fidelity.2q_avg": {
+          "regex": "2Q gate error[^(]*\\((\\d\\.\\d+%)\\)",
+          "as": "fraction_complement",
+          "method": "average"
+        },
+        "vendor_metric": {
+          "regex": "#?AQ\\s*(\\d+)",
+          "method": "benchmark-derived"
+        },
+        "pricing.per_shot": {
+          "const": "USD 0.08",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.per_task": {
+          "const": "USD 0.30",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.comments": {
+          "const": "Amazon Braket on-demand: $0.08/shot + $0.30/task. Error-mitigated runs require a minimum of 2,500 shots/task.",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        }
+      }
+    },
+    {
+      "vendor": "ibm",
+      "tier": "vendor",
+      "backend_name": "IBM Heron r2",
+      "meta": {
+        "system_name": "IBM Quantum Heron",
+        "model": "Heron r2",
+        "commercial_release": "2024",
+        "type": "gate-based (superconducting)"
+      },
+      "url": "https://www.ibm.com/quantum/technology",
+      "_status": "Cited const (JS page). Prefer the live `ibm` API adapter for per-gate calibration.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 156,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://www.ibm.com/quantum/technology"
+        },
+        "qpu_topology.type": {
+          "const": "heavy-hex (tunable coupler)",
+          "method": "vendor-spec",
+          "source": "https://www.ibm.com/quantum/technology"
+        },
+        "fidelity.2q_median": {
+          "const": 0.997,
+          "as": "float",
+          "method": "benchmark-derived",
+          "source": "https://quantum.cloud.ibm.com/docs/en/guides/processor-types"
+        },
+        "fidelity.2q_max": {
+          "const": 0.999,
+          "as": "float",
+          "method": "maximum",
+          "source": "https://quantum.cloud.ibm.com/docs/en/guides/processor-types"
+        },
+        "pricing.per_second": {
+          "const": "USD 1.60",
+          "method": "vendor-spec",
+          "source": "https://quantum.cloud.ibm.com/docs/en/guides/plans-overview"
+        },
+        "pricing.comments": {
+          "const": "Pay-as-you-go ~$1.60/sec ($96/min QPU time). Volume plans: Flex $72/min, Premium (5,200 min/yr) $48/min. Same rate across all Heron systems.",
+          "method": "vendor-spec",
+          "source": "https://quantum.cloud.ibm.com/docs/en/guides/plans-overview"
+        }
+      }
+    },
+    {
+      "vendor": "google",
+      "tier": "vendor",
+      "backend_name": "Google Willow",
+      "meta": {
+        "system_name": "Willow",
+        "model": "Willow",
+        "planned_release": "early access 2025",
+        "commercial_release": "announced 2024-12",
+        "type": "gate-based (superconducting)"
+      },
+      "url": "https://blog.google/technology/research/google-willow-quantum-chip/",
+      "_status": "Cited const; fidelities from Google's Dec-2024 Nature-published announcement.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 105,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://blog.google/technology/research/google-willow-quantum-chip/"
+        },
+        "qpu_topology.type": {
+          "const": "square-lattice (tunable coupler)",
+          "method": "vendor-spec",
+          "source": "https://blog.google/technology/research/google-willow-quantum-chip/"
+        },
+        "fidelity.2q_median": {
+          "const": 0.9988,
+          "as": "float",
+          "method": "median",
+          "source": "https://blog.google/technology/research/google-willow-quantum-chip/"
+        },
+        "fidelity.1q_avg": {
+          "const": 0.9997,
+          "as": "float",
+          "method": "median",
+          "source": "https://blog.google/technology/research/google-willow-quantum-chip/"
+        }
+      }
+    },
+    {
+      "vendor": "iqm",
+      "tier": "publication",
+      "backend_name": "IQM Garnet",
+      "meta": {
+        "system_name": "Garnet",
+        "model": "Garnet",
+        "commercial_release": "2024",
+        "type": "gate-based (superconducting)"
+      },
+      "url": "https://arxiv.org/abs/2408.12433",
+      "_status": "Cited const from IQM's 20-qubit benchmark whitepaper (arXiv 2408.12433). Also live on Braket.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 20,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://arxiv.org/abs/2408.12433"
+        },
+        "qpu_topology.type": {
+          "const": "square-lattice (tunable coupler)",
+          "method": "vendor-spec",
+          "source": "https://arxiv.org/abs/2408.12433"
+        },
+        "fidelity.2q_median": {
+          "const": 0.9951,
+          "as": "float",
+          "method": "median",
+          "source": "https://arxiv.org/abs/2408.12433"
+        },
+        "fidelity.2q_max": {
+          "const": 0.998,
+          "as": "float",
+          "method": "maximum",
+          "source": "https://arxiv.org/abs/2408.12433"
+        },
+        "fidelity.1q_avg": {
+          "const": 0.9992,
+          "as": "float",
+          "method": "median",
+          "source": "https://arxiv.org/abs/2408.12433"
+        },
+        "operation_speed.2q_gate_time_s": {
+          "const": 3e-08,
+          "as": "float",
+          "method": "average",
+          "source": "https://arxiv.org/abs/2408.12433"
+        },
+        "pricing.per_shot": {
+          "const": "USD 0.00145",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.per_task": {
+          "const": "USD 0.30",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.comments": {
+          "const": "Amazon Braket on-demand: $0.00145/shot + $0.30/task.",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        }
+      }
+    },
+    {
+      "vendor": "oqc",
+      "tier": "vendor",
+      "backend_name": "OQC Toshiko",
+      "meta": {
+        "system_name": "Toshiko",
+        "model": "Toshiko Gen-1",
+        "commercial_release": "2024",
+        "type": "gate-based (superconducting, coaxmon)"
+      },
+      "url": "https://oqc.tech/company/newsroom/toshiko-the-worlds-first-enterprise-ready-quantum-platform/",
+      "_status": "Cited const; fidelities from OQC newsroom + arXiv 2601.20458.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 32,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://oqc.tech/company/newsroom/toshiko-the-worlds-first-enterprise-ready-quantum-platform/"
+        },
+        "qpu_topology.type": {
+          "const": "coaxmon planar-lattice (ECR gates)",
+          "method": "vendor-spec",
+          "source": "https://oqc.tech/company/newsroom/toshiko-the-worlds-first-enterprise-ready-quantum-platform/"
+        },
+        "fidelity.2q_median": {
+          "const": 0.99,
+          "as": "float",
+          "method": "median",
+          "source": "https://arxiv.org/abs/2601.20458"
+        },
+        "fidelity.1q_avg": {
+          "const": 0.999,
+          "as": "float",
+          "method": "median",
+          "source": "https://arxiv.org/abs/2601.20458"
+        },
+        "fidelity.spam_avg": {
+          "const": 0.96,
+          "as": "float",
+          "method": "median",
+          "source": "https://arxiv.org/abs/2601.20458"
+        }
+      }
+    },
+    {
+      "vendor": "rigetti",
+      "tier": "vendor",
+      "backend_name": "Rigetti Ankaa-3",
+      "meta": {
+        "system_name": "Ankaa-3",
+        "model": "Ankaa-3",
+        "commercial_release": "2024-12",
+        "type": "gate-based (superconducting)"
+      },
+      "url": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone",
+      "_status": "Cited const from Rigetti launch release. Prefer live Rigetti QCS API / Braket. 2q_median is fSim; iSWAP median is 0.99.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 84,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone"
+        },
+        "qpu_topology.type": {
+          "const": "square-lattice (tunable coupler)",
+          "method": "vendor-spec",
+          "source": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone"
+        },
+        "fidelity.2q_median": {
+          "const": 0.995,
+          "as": "float",
+          "method": "median",
+          "source": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone"
+        },
+        "operation_speed.2q_gate_time_s": {
+          "const": 5.6e-08,
+          "as": "float",
+          "method": "median",
+          "source": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone"
+        },
+        "pricing.per_shot": {
+          "const": "USD 0.00090",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.per_task": {
+          "const": "USD 0.30",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.comments": {
+          "const": "Amazon Braket on-demand: $0.00090/shot + $0.30/task.",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        }
+      }
+    },
+    {
+      "vendor": "quera",
+      "tier": "publication",
+      "backend_name": "QuEra Aquila",
+      "meta": {
+        "system_name": "Aquila",
+        "model": "Aquila",
+        "commercial_release": "2022-11-01",
+        "type": "analog (neutral-atom)"
+      },
+      "url": "https://arxiv.org/abs/2306.11727",
+      "_status": "Analog Rydberg device (FPQA): no gate-model fidelity/QV apply. Cited const from arXiv 2306.11727 + AWS Braket.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 256,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://arxiv.org/abs/2306.11727"
+        },
+        "qpu_topology.type": {
+          "const": "reconfigurable-neutral-atom (analog Rydberg FPQA)",
+          "method": "vendor-spec",
+          "source": "https://arxiv.org/abs/2306.11727"
+        },
+        "pricing.per_shot": {
+          "const": "USD 0.01",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.per_task": {
+          "const": "USD 0.30",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        },
+        "pricing.comments": {
+          "const": "Amazon Braket on-demand: $0.01/shot + $0.30/task.",
+          "method": "vendor-spec",
+          "source": "https://aws.amazon.com/braket/pricing/"
+        }
+      }
+    },
+    {
+      "vendor": "pasqal",
+      "tier": "vendor",
+      "backend_name": "Pasqal Orion Beta",
+      "meta": {
+        "system_name": "Orion",
+        "model": "Orion Beta",
+        "commercial_release": "2024",
+        "type": "analog + gate-based (neutral-atom)"
+      },
+      "url": "https://www.pasqal.com/wp-content/uploads/2025/03/Technical-Overview-for-Advanced-Users-Orion-Beta.pdf",
+      "_status": "Neutral-atom (analog + digital). Cited const from Pasqal Orion Beta technical overview (PDF).",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 100,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://www.pasqal.com/wp-content/uploads/2025/03/Technical-Overview-for-Advanced-Users-Orion-Beta.pdf"
+        },
+        "qpu_topology.type": {
+          "const": "reconfigurable-neutral-atom (Rb-87 tweezers, analog+digital)",
+          "method": "vendor-spec",
+          "source": "https://www.pasqal.com/wp-content/uploads/2025/03/Technical-Overview-for-Advanced-Users-Orion-Beta.pdf"
+        }
+      }
+    },
+    {
+      "vendor": "dwave",
+      "tier": "vendor",
+      "backend_name": "D-Wave Advantage2",
+      "meta": {
+        "system_name": "Advantage2",
+        "model": "Advantage2",
+        "commercial_release": "2025-05-20",
+        "type": "quantum annealer (superconducting)"
+      },
+      "url": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/",
+      "_status": "Quantum ANNEALER (not gate-model): gate fidelity / QV do not apply. Cited const from GA press release.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 4400,
+          "as": "int",
+          "method": "minimum",
+          "source": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/"
+        },
+        "qpu_topology.type": {
+          "const": "Zephyr (annealing, degree-20)",
+          "method": "vendor-spec",
+          "source": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/"
+        },
+        "qpu_topology.edges": {
+          "const": "40000+ couplers",
+          "method": "vendor-spec",
+          "source": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/"
+        },
+        "pricing.per_hour": {
+          "const": "~USD 2,000 (historical Leap QPU-access rate)",
+          "method": "third-party",
+          "source": "https://venturebeat.com/business/d-wave-announces-leap-2-its-cloud-service-for-quantum-computing-applications"
+        },
+        "pricing.comments": {
+          "const": "Quantum annealer; access via Leap cloud subscription or AWS Marketplace. Historical direct QPU-access rate ~$2,000/hr; current pricing sold as subscription blocks (contact D-Wave).",
+          "method": "vendor-spec",
+          "source": "https://www.dwavequantum.com/solutions-and-products/cloud-platform/"
+        }
+      }
+    },
+    {
+      "vendor": "infleqtion",
+      "tier": "vendor",
+      "backend_name": "Infleqtion Sqale",
+      "meta": {
+        "system_name": "Sqale",
+        "model": "Sqale",
+        "commercial_release": "2025",
+        "type": "gate-based (neutral-atom)"
+      },
+      "url": "https://infleqtion.com/quantum-computing/",
+      "_status": "Neutral-atom. Cited const; 1600 physical qubits, 99.73% 2Q fidelity, 12 logical (post-selection) per 2025 disclosures.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 1600,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://infleqtion.com/quantum-computing/"
+        },
+        "qpu_topology.type": {
+          "const": "reconfigurable-neutral-atom",
+          "method": "vendor-spec",
+          "source": "https://infleqtion.com/quantum-computing/"
+        },
+        "fidelity.2q_avg": {
+          "const": 0.9973,
+          "as": "float",
+          "method": "average",
+          "source": "https://infleqtion.com/quantum-computing/"
+        }
+      }
+    },
+    {
+      "vendor": "quantware",
+      "tier": "vendor",
+      "backend_name": "QuantWare Contralto-D21",
+      "meta": {
+        "system_name": "Contralto-D",
+        "model": "Contralto-D21",
+        "commercial_release": "2024",
+        "type": "hardware supplier (superconducting)"
+      },
+      "url": "https://www.quantware.com/product/contralto",
+      "_status": "QPU HARDWARE vendor (sells the chip, not cloud time). Cited const; D-line reference-setup benchmarks + list price.",
+      "fields": {
+        "qpu_topology.qubits": {
+          "const": 21,
+          "as": "int",
+          "method": "vendor-spec",
+          "source": "https://www.quantware.com/product/contralto"
+        },
+        "qpu_topology.type": {
+          "const": "square-lattice (superconducting transmon)",
+          "method": "vendor-spec",
+          "source": "https://www.quantware.com/product/contralto"
+        },
+        "fidelity.2q_avg": {
+          "const": 0.997,
+          "as": "float",
+          "method": "average",
+          "source": "https://quantware.com/news/generation-d-quantum-processors"
+        },
+        "fidelity.1q_avg": {
+          "const": 0.999,
+          "as": "float",
+          "method": "average",
+          "source": "https://quantware.com/news/generation-d-quantum-processors"
+        },
+        "fidelity.spam_avg": {
+          "const": 0.975,
+          "as": "float",
+          "method": "average",
+          "source": "https://quantware.com/news/generation-d-quantum-processors"
+        },
+        "pricing.per_system": {
+          "const": "~EUR 300,000",
+          "method": "vendor-spec",
+          "source": "https://www.quantware.com/product/contralto"
+        }
+      }
+    },
+    {
+      "vendor": "alice-and-bob",
+      "tier": "vendor",
+      "backend_name": "Alice & Bob Boson",
+      "meta": {
+        "system_name": "Boson",
+        "model": "Boson 4",
+        "planned_release": "logical-qubit systems on 2030 roadmap",
+        "type": "gate-based (superconducting cat-qubit)"
+      },
+      "url": "https://alice-bob.com/newsroom/alice-bob-quantum-computing-roadmap/",
+      "_status": "Cat-qubit (bosonic) architecture, pre-commercial / roadmap-stage. Conventional gate-fidelity/QV not disclosed; only architecture + bit-flip record are public.",
+      "fields": {
+        "qpu_topology.type": {
+          "const": "cat-qubit (bosonic, superconducting)",
+          "method": "vendor-spec",
+          "source": "https://alice-bob.com/newsroom/alice-bob-quantum-computing-roadmap/"
+        },
+        "vendor_metric": {
+          "const": "Boson 4 bit-flip lifetime >1 hour (Sep 2025)",
+          "method": "measured",
+          "source": "https://alice-bob.com/newsroom/alice-bob-surpasses-bit-flip-stability-record/"
+        }
+      }
+    },
+    {
+      "vendor": "neqxt",
+      "tier": "third-party",
+      "backend_name": "neQxt maQue",
+      "meta": {
+        "system_name": "maQue",
+        "model": "maQue",
+        "planned_release": "in development (Cyberagentur contract)",
+        "type": "gate-based (trapped-ion)"
+      },
+      "url": "https://entangledfuture.com/company/neqxt/",
+      "_status": "Trapped-ion, early stage; qubit count and fidelities not publicly disclosed. Third-party index source.",
+      "fields": {
+        "qpu_topology.type": {
+          "const": "trapped-ion (surface trap)",
+          "method": "vendor-spec",
+          "source": "https://entangledfuture.com/company/neqxt/"
+        }
+      }
+    }
+  ],
+  "csv_sources": [
+    {
+      "enabled": true,
+      "tier": "csv-baseline",
+      "path": "nisqaas_market_prices.csv",
+      "_note": "Historical market-analysis baseline. Added after live adapters, so a live-scraped value wins for overlapping systems; every other row is imported intact with its own Tech/Price provenance."
+    }
+  ]
+}

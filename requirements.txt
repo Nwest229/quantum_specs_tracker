@@ -1,0 +1,17 @@
+# Core pipeline runs on the Python 3.9+ standard library alone.
+# Everything below is OPTIONAL and unlocks richer/validated sourcing.
+
+# Output schema validation (strongly recommended; already present here)
+jsonschema>=4.0
+
+# HTML spec scraping via CSS selectors (regex rules work without it)
+beautifulsoup4>=4.11
+
+# Excel workbook export (`python3 -m qscrape --xlsx`)
+openpyxl>=3.1
+
+# IBM per-gate calibration + fidelity statistics (needs IBM_QUANTUM_TOKEN)
+# qiskit-ibm-runtime>=0.20
+
+# Amazon Braket multi-vendor device capabilities (needs AWS credentials)
+# amazon-braket-sdk>=1.70

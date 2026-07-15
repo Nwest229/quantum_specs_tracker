@@ -1,0 +1,12 @@
+.cache/
+__pycache__/
+*.pyc
+.venv/
+venv/
+data/backends.json
+data/run_report.json
+data/quantum_tracker.xlsx
+# NB: data/price_history.json is intentionally NOT ignored — it is the
+# accumulated time-series record, not a per-run regenerable artifact.
+
+.DS_Store
