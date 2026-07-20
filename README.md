@@ -91,7 +91,7 @@ Field rules: `regex` / `selector` (CSS) / `json_path` pull a value from the page
 `int`, `float`, `fraction` (99.7% → 0.997), `fraction_complement` (error 0.4% →
 0.996), `str`.
 
-### Option 2 — let ChatGPT read the page for me
+### Option 2 — let AI read the page for me
 
 For the JS pages I can't scrape, I paste the prompt below into ChatGPT (with
 browsing on) and give it the vendor link. It reads the page and hands back a
