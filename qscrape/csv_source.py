@@ -180,6 +180,8 @@ def records_from_csv(path: str) -> Iterable[BackendRecord]:
             continue  # blank/placeholder row
         if vendor.lower().startswith("eleqtron"):
             continue  # tracker holds competitors only; eleQtron rows are excluded
+        if _clean(row[COL["type"]]).lower() == "qem":
+            continue  # emulators / simulators (QEm) — not real QPUs
         yield _record(row, vendor)
 
 

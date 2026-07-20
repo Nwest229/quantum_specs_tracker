@@ -102,7 +102,7 @@ config block I paste straight into `spec_sources`.
 ```
 You are a data-extraction assistant for a provenance-first quantum-computing hardware database. Browse the page at:
 
-<PASTE URL HERE>
+PASTE URL HERE
 
 Extract the hardware specs for the quantum backend described there and return them as ONE JSON object that matches the exact template and rules below. This will be pasted directly into a config file, so output ONLY the JSON — no prose, no markdown fences.
 
