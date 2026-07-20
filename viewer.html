@@ -49,7 +49,15 @@
   .yes{color:var(--good);} .no{color:var(--muted);}
   a.src { color:var(--muted); text-decoration:none; margin-left:5px; font-size:10.5px;
     border:1px solid var(--line); border-radius:5px; padding:0 4px; }
-  a.src:hover { color:var(--accent); border-color:var(--accent); }
+  a.src:hover { filter:brightness(1.25); }
+  /* colour the source badge by provenance: how the value was obtained */
+  a.src-api { color:var(--good);   border-color:var(--good); }    /* live API */
+  a.src-web { color:var(--accent); border-color:var(--accent); }  /* vendor web page */
+  a.src-pdf { color:var(--warn);   border-color:var(--warn); }    /* PDF data sheet */
+  a.src-pub { color:#c678dd;       border-color:#c678dd; }        /* paper / arXiv */
+  .srclegend { color:var(--muted); font-size:12px; margin:2px 0 10px;
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  .srclegend .src { cursor:default; }
   .pct { color:var(--good); }
   .meta { color:var(--muted); font-size:12px; margin-top:10px; }
   .drop { border:2px dashed var(--line); border-radius:14px; margin:40px 22px; padding:60px;
@@ -98,6 +106,13 @@
 
 <!-- TABLE VIEW -->
 <div class="wrap hidden" id="view-table">
+  <div class="srclegend">Source badge:
+    <span><a class="src src-api">api</a> live API (Braket/IBM)</span>
+    <span><a class="src src-web">web</a> vendor page</span>
+    <span><a class="src src-pdf">pdf</a> PDF data sheet</span>
+    <span><a class="src src-pub">pub</a> paper / arXiv</span>
+    <span><a class="src">src</a> other</span>
+  </div>
   <div class="tblwrap"><table id="tbl"></table></div>
   <div class="meta" id="meta"></div>
 </div>
@@ -140,8 +155,8 @@ let DATA = [], sortCol = 0, sortAsc = true;
 const G = {id:"Identity", head:"Headline", topo:"Topology", fid:"Fidelity",
            speed:"Speed", feat:"Features", price:"Pricing", prov:"Provenance"};
 function leaf(b,grp,k){ const g=b[grp]||{}; const v=g[k];
-  const s=(b.sources||[]).find(x=>x.field===`${grp}.${k}`); return {value:v, source:s&&s.url}; }
-function prov(b,name){ const v=b[name]; if(v&&typeof v==="object") return {value:v.value, source:v.source}; return {value:v}; }
+  const s=(b.sources||[]).find(x=>x.field===`${grp}.${k}`); return {value:v, source:s&&s.url, skind:s&&s.kind}; }
+function prov(b,name){ const v=b[name]; if(v&&typeof v==="object") return {value:v.value, source:v.source, skind:v.kind}; return {value:v}; }
 function scalar(v){ return {value:v}; }
 function techSrc(b){ const s=(b.sources||[]).find(x=>x.field&&x.field.indexOf("pricing.")!==0); return s||{}; }
 function priceSrc(b){ const s=(b.sources||[]).find(x=>x.field&&x.field.indexOf("pricing.")===0); return s||{}; }
@@ -159,7 +174,7 @@ const COLS = [
   ["argmax","Argmax","head","str", b=>prov(b,"argmax")],
   ["black_box","Algo Qubits","head","str", b=>prov(b,"black_box")],
   ["vendor_metric","Vendor metric","head","str", b=>prov(b,"vendor_metric")],
-  ["theo","Theo max 2^","head","num", b=>({value: (b.derived_metrics&&b.derived_metrics.theoretical_max&&b.derived_metrics.theoretical_max.log2_value!=null)?round(b.derived_metrics.theoretical_max.log2_value):UNKNOWN, source:(b.theoretical_max||{}).source})],
+  ["theo","Theo max 2^","head","num", b=>({value: (b.derived_metrics&&b.derived_metrics.theoretical_max&&b.derived_metrics.theoretical_max.log2_value!=null)?round(b.derived_metrics.theoretical_max.log2_value):UNKNOWN, source:(b.theoretical_max||{}).source, skind:(b.theoretical_max||{}).kind})],
   ["qv","Quantum Vol","head","num", b=>prov(b,"quantum_volume")],
 
   ["qubits","#Qubits","topo","num", b=>leaf(b,"qpu_topology","qubits")],
@@ -202,8 +217,8 @@ const COLS = [
   ["psys","Price/system","price","str", b=>leaf(b,"pricing","per_system")],
   ["pcom","Comment","price","str", b=>leaf(b,"pricing","comments")],
 
-  ["tsrc","Tech src","prov","link", b=>{const s=techSrc(b); return {value:s.retrieved||UNKNOWN, source:s.url};}],
-  ["psrc","Price src","prov","link", b=>{const s=priceSrc(b); return {value:s.retrieved||UNKNOWN, source:s.url};}],
+  ["tsrc","Tech src","prov","link", b=>{const s=techSrc(b); return {value:s.retrieved||UNKNOWN, source:s.url, skind:s.kind};}],
+  ["psrc","Price src","prov","link", b=>{const s=priceSrc(b); return {value:s.retrieved||UNKNOWN, source:s.url, skind:s.kind};}],
 ];
 const GROUP_ORDER = ["id","head","topo","fid","speed","feat","price","prov"];
 let VISIBLE = new Set(["id","head","topo","fid","price","prov"]); // fid on, speed/feat off by default to keep width sane
@@ -219,8 +234,23 @@ function fmtCell(cell, kind){
   else if (kind==="num" && typeof v==="number") text=v.toLocaleString();
   else if (kind==="vendor") cls="vendor";
   else if (kind==="bool"){ const t=/^(yes|true|supported|available)/i.test(text); cls=t?"yes":"no"; }
-  const link = cell.source ? ` <a class="src" href="${cell.source}" target="_blank" rel="noopener" title="${cell.source}">src</a>` : "";
+  const link = cell.source ? srcBadge(cell.source, cell.skind) : "";
   return `<span class="${cls}">${text}</span>${link}`;
+}
+// classify a source by how the value was obtained, and render a coloured badge
+function srcCategory(skind, url){
+  if(skind==="cloud-api"||skind==="calibration-api") return "api";
+  if(url && /\.pdf(\?|#|$)/i.test(url)) return "pdf";
+  if(skind==="vendor") return "web";
+  if(skind==="publication") return "pub";
+  return "";
+}
+function srcBadge(url, skind){
+  const cat = srcCategory(skind, url);
+  const label = {api:"api", pdf:"pdf", web:"web", pub:"pub"}[cat] || "src";
+  const cls = cat ? `src src-${cat}` : "src";
+  const tip = (skind||"source") + " · " + url;
+  return ` <a class="${cls}" href="${url}" target="_blank" rel="noopener" title="${tip}">${label}</a>`;
 }
 function activeCols(){ return COLS.filter(c=>VISIBLE.has(c[2])); }
 
