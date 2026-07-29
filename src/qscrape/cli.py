@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from .httpcache import HttpCache
+from .logging import configure_logging, get_logger
 from .pipeline import Pipeline
 from .settings import get_settings
 
@@ -42,6 +43,8 @@ def _filter_config(config: dict[str, Any], only: list[str]) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     settings = get_settings()
+    configure_logging(settings)
+    log = get_logger(__name__)
 
     p = argparse.ArgumentParser(
         prog="qscrape", description="Build the combined quantum-backend JSON array."
@@ -63,6 +66,14 @@ def main(argv: list[str] | None = None) -> int:
     with Path(args.config).open(encoding="utf-8") as fh:
         config = _filter_config(json.load(fh), args.only)
 
+    log.info(
+        "pipeline.start",
+        config=args.config,
+        out=args.out,
+        no_cache=args.no_cache,
+        only=args.only or None,
+    )
+
     http = HttpCache(
         cache_dir=settings.cache_dir,
         max_age=0 if args.no_cache else config.get("cache_max_age", settings.cache_max_age),
@@ -80,6 +91,23 @@ def main(argv: list[str] | None = None) -> int:
         write_workbook(docs, xlsx_path)
 
     rep = pipe.report
+    for w in rep["warnings"]:
+        log.warning("pipeline.warning", detail=w)
+    for e in rep["validation_errors"]:
+        log.error(
+            "pipeline.validation_error",
+            backend=e["backend"],
+            path=e["path"],
+            message=e["message"],
+        )
+    log.info(
+        "pipeline.done",
+        backends=rep["counts"].get("backends", 0),
+        vendors=rep["counts"].get("vendors", 0),
+        warnings=len(rep["warnings"]),
+        validation_errors=len(rep["validation_errors"]),
+    )
+
     if not args.quiet:
         print(
             f"backends: {rep['counts'].get('backends', 0)}  "
