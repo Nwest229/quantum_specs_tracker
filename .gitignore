@@ -9,3 +9,13 @@ data/quantum_tracker.xlsx
 # built snapshot needs to be in the repo. Re-commit it after a fresh run.
 
 .DS_Store
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+.env
+.claude/

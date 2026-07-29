@@ -3,22 +3,24 @@
 Produces a *single combined JSON array* of backend records (per the chosen
 output format), plus a run report of warnings and validation errors.
 """
+
 from __future__ import annotations
 
 import json
-import os
+from pathlib import Path
 from typing import Any
 
 from . import adapters as adp
 from .httpcache import HttpCache
-from .models import BackendRecord, now_iso, _SCALAR_META
+from .models import _SCALAR_META, BackendRecord, now_iso
 from .normalize import finalize
 
-ROOT = os.path.dirname(os.path.dirname(__file__))
-SCHEMA_PATH = os.path.join(ROOT, "schema", "backend.schema.json")
+ROOT = Path(__file__).parent.parent.parent
+SCHEMA_PATH = ROOT / "schema" / "backend.schema.json"
 
 try:
-    import jsonschema  # type: ignore
+    import jsonschema
+
     _HAVE_JSONSCHEMA = True
 except ImportError:  # pragma: no cover
     _HAVE_JSONSCHEMA = False
@@ -29,25 +31,29 @@ def _record_key(name: str, vendor: str) -> str:
 
 
 def _is_skip(rec: BackendRecord) -> bool:
-    return rec.meta.get("skipped") or rec.backend_name.startswith("__")
+    return bool(rec.meta.get("skipped")) or rec.backend_name.startswith("__")
 
 
 class Pipeline:
-    def __init__(self, config: dict, http: HttpCache | None = None):
+    def __init__(self, config: dict[str, Any], http: HttpCache | None = None) -> None:
         self.config = config
         self.http = http or HttpCache(
             max_age=config.get("cache_max_age", 86400),
             delay=config.get("request_delay", 1.0),
         )
         self.records: dict[str, BackendRecord] = {}
-        self.report: dict[str, Any] = {"generated": now_iso(), "warnings": [],
-                                       "validation_errors": [], "counts": {}}
+        self.report: dict[str, Any] = {
+            "generated": now_iso(),
+            "warnings": [],
+            "validation_errors": [],
+            "counts": {},
+        }
 
     # -- collection -------------------------------------------------------
-    def run(self) -> list[dict]:
+    def run(self) -> list[dict[str, Any]]:
         self._run_api_adapters()
         self._run_spec_adapters()
-        self._run_csv_sources()   # baseline: added last so live values win on merge
+        self._run_csv_sources()  # baseline: added last so live values win on merge
         for rec in self.records.values():
             finalize(rec)
         docs = [rec.to_dict() for rec in self.records.values()]
@@ -89,12 +95,14 @@ class Pipeline:
 
     def _run_csv_sources(self) -> None:
         from .csv_source import records_from_csv
+
         for entry in self.config.get("csv_sources", []):
             if not entry.get("enabled", True):
                 continue
-            path = entry.get("path", "")
-            if not os.path.isabs(path):
-                path = os.path.join(ROOT, path)
+            path_str = entry.get("path", "")
+            path = Path(path_str)
+            if not path.is_absolute():
+                path = ROOT / path_str
             n = 0
             for rec in records_from_csv(path):
                 self._add(rec)
@@ -102,8 +110,9 @@ class Pipeline:
             if n == 0:
                 self.report["warnings"].append(f"csv source '{path}' yielded no rows")
             else:
-                self.report.setdefault("counts", {})["csv_rows"] = \
+                self.report.setdefault("counts", {})["csv_rows"] = (
                     self.report.get("counts", {}).get("csv_rows", 0) + n
+                )
 
     @staticmethod
     def _merge_into(base: BackendRecord, new: BackendRecord) -> None:
@@ -122,29 +131,32 @@ class Pipeline:
                 setattr(base, k, getattr(new, k))
 
     # -- validation -------------------------------------------------------
-    def _validate(self, docs: list[dict]) -> None:
+    def _validate(self, docs: list[dict[str, Any]]) -> None:
         if not _HAVE_JSONSCHEMA:
             self.report["warnings"].append("jsonschema not installed; skipped validation")
             return
-        with open(SCHEMA_PATH, encoding="utf-8") as fh:
+        with SCHEMA_PATH.open(encoding="utf-8") as fh:
             schema = json.load(fh)
         validator = jsonschema.Draft7Validator(schema)
         for doc in docs:
             for err in validator.iter_errors(doc):
-                self.report["validation_errors"].append({
-                    "backend": doc.get("backend_name"),
-                    "path": "/".join(str(p) for p in err.absolute_path),
-                    "message": err.message,
-                })
+                self.report["validation_errors"].append(
+                    {
+                        "backend": doc.get("backend_name"),
+                        "path": "/".join(str(p) for p in err.absolute_path),
+                        "message": err.message,
+                    }
+                )
 
     # -- output -----------------------------------------------------------
-    def write(self, docs: list[dict], out_path: str) -> None:
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
-        tmp = out_path + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as fh:
+    def write(self, docs: list[dict[str, Any]], out_path: str) -> None:
+        out = Path(out_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        tmp = out.with_name(out.name + ".tmp")
+        with tmp.open("w", encoding="utf-8") as fh:
             json.dump(docs, fh, indent=2, ensure_ascii=False)
             fh.write("\n")
-        os.replace(tmp, out_path)
-        report_path = os.path.join(os.path.dirname(out_path), "run_report.json")
-        with open(report_path, "w", encoding="utf-8") as fh:
+        tmp.replace(out)
+        report_path = out.parent / "run_report.json"
+        with report_path.open("w", encoding="utf-8") as fh:
             json.dump(self.report, fh, indent=2)

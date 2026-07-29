@@ -4,6 +4,7 @@ Maps a source-tier name (used in config) to an Adapter class. HtmlSpecAdapter
 is instantiated per-backend entry; API adapters are instantiated once and may
 emit many records.
 """
+
 from .base import Adapter
 from .braket import BraketAdapter
 from .html_spec import HtmlSpecAdapter
@@ -18,5 +19,11 @@ API_ADAPTERS = {
 # per-backend declarative adapter
 SPEC_ADAPTER = HtmlSpecAdapter
 
-__all__ = ["Adapter", "API_ADAPTERS", "SPEC_ADAPTER",
-           "BraketAdapter", "HtmlSpecAdapter", "IBMAdapter"]
+__all__ = [
+    "API_ADAPTERS",
+    "SPEC_ADAPTER",
+    "Adapter",
+    "BraketAdapter",
+    "HtmlSpecAdapter",
+    "IBMAdapter",
+]

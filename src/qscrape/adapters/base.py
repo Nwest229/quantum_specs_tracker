@@ -4,10 +4,12 @@ An adapter knows how to turn one *source tier* for one vendor into
 ``BackendRecord`` objects. Adapters must NEVER invent values: if a datum is
 absent, leave the Field at its UNKNOWN default.
 """
+
 from __future__ import annotations
 
 import abc
-from typing import Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from ..httpcache import HttpCache
 from ..models import BackendRecord
@@ -19,7 +21,7 @@ class Adapter(abc.ABC):
     #: source tier: "cloud-api" | "calibration-api" | "vendor" | "publication"
     tier: str = "vendor"
 
-    def __init__(self, http: HttpCache, config: dict | None = None):
+    def __init__(self, http: HttpCache, config: dict[str, Any] | None = None) -> None:
         self.http = http
         self.config = config or {}
 
