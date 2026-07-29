@@ -14,7 +14,7 @@ from .httpcache import HttpCache
 from .models import BackendRecord, now_iso, _SCALAR_META
 from .normalize import finalize
 
-ROOT = os.path.dirname(os.path.dirname(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 SCHEMA_PATH = os.path.join(ROOT, "schema", "backend.schema.json")
 
 try:

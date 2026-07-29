@@ -20,7 +20,7 @@ import sys
 from .httpcache import HttpCache
 from .pipeline import Pipeline
 
-ROOT = os.path.dirname(os.path.dirname(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _SENTINEL = object()
 
 

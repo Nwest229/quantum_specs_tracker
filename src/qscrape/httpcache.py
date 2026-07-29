@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
 
-DEFAULT_CACHE = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".cache")
+DEFAULT_CACHE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".cache")
 UA = "elQtron-quantum-db/0.1 (+research; contact via repo)"
 
 
