@@ -11,30 +11,95 @@ fairly standard config-driven scraper pattern I took from online examples, not
 something I invented. **The front end — `viewer.html` and all the charts — is
 pure Claude. I didn't write any of that.**
 
-## Running it
+## Quickstart (uv)
 
-I run everything through the project's virtualenv, because the system Python on
-my Mac ships an old SSL that breaks the IBM API:
+The project is managed with [uv](https://docs.astral.sh/uv/) and lives under
+`src/qscrape/` (a standard `src/` layout). Python 3.12 or 3.13.
 
 ```bash
-.venv/bin/python -m qscrape                      # build data/backends.json
-.venv/bin/python -m qscrape --xlsx               # also write the Excel workbook
-.venv/bin/python -m qscrape --only ionq          # just one vendor (handy when testing a new entry)
-.venv/bin/python -m unittest tests.test_pipeline # the tests
+curl -LsSf https://astral.sh/uv/install.sh | sh   # if you don't have uv yet
+uv sync --group dev                               # install runtime + dev deps into .venv
+
+uv run python -m qscrape                          # build data/backends.json
+uv run python -m qscrape --xlsx                   # also write the Excel workbook
+uv run python -m qscrape --only ionq              # just one vendor (handy when testing a new entry)
+uv run pytest                                     # the test suite (25 tests)
 ```
+
+Or just run `./bootstrap.sh`, which installs uv if needed, syncs dependencies,
+installs the pre-commit hooks, and runs lint/typecheck/tests once so you know
+the checkout is healthy.
+
+Optional extras (`qiskit-ibm-runtime`, `amazon-braket-sdk`, `beautifulsoup4`,
+`openpyxl`) are declared under `[project.optional-dependencies]` in
+`pyproject.toml` -- install with e.g. `uv sync --extra ibm --extra braket` or
+`uv sync --all-extras --group dev` if you want everything.
 
 To see the table and charts, serve the folder and open the viewer:
 
 ```bash
-.venv/bin/python -m http.server
+uv run python -m http.server
 # then open http://localhost:8000/viewer.html
 ```
 
 What comes out:
 
-- `data/backends.json` — the combined data, one object per backend, every value cited.
-- `data/quantum_tracker.xlsx` — the same thing as an Excel file with charts.
-- `viewer.html` — the sortable table + charts (Claude's work).
+- `data/backends.json` -- the combined data, one object per backend, every value cited.
+- `data/quantum_tracker.xlsx` -- the same thing as an Excel file with charts.
+- `viewer.html` -- the sortable table + charts (Claude's work).
+
+## Configuration
+
+Runtime settings are centralized in `src/qscrape/settings.py` (pydantic-settings).
+Everything is overridable via environment variable or a `.env` file in the repo
+root; copy `.env.example` to `.env` to get started. CLI flags (`--config`,
+`--out`, `--xlsx`), when passed explicitly, always win over env/settings
+defaults.
+
+| Variable                   | Default                     | Meaning                                                                     |
+|-----------------------------|------------------------------|-------------------------------------------------------------------------------|
+| `QSCRAPE_LOG_LEVEL`         | `INFO`                       | stdlib/structlog log level                                                    |
+| `QSCRAPE_LOG_JSON`          | `true`                       | JSON logs when true, human-readable console renderer when false               |
+| `QSCRAPE_CONFIG_PATH`       | `config/sources.json`        | source registry read by the pipeline                                          |
+| `QSCRAPE_OUT_PATH`          | `data/backends.json`         | combined JSON output path                                                     |
+| `QSCRAPE_XLSX_PATH`         | `data/quantum_tracker.xlsx`  | Excel workbook path (used when `--xlsx` has no explicit path)                 |
+| `QSCRAPE_CACHE_DIR`         | `.cache`                     | on-disk HTTP cache directory                                                   |
+| `QSCRAPE_CACHE_MAX_AGE`     | `86400` (seconds)            | cache freshness window; `--no-cache` forces `0` regardless of this value      |
+| `QSCRAPE_REQUEST_DELAY`     | `1.0` (seconds)              | politeness delay between live HTTP fetches                                    |
+| `QSCRAPE_IBM_QUANTUM_TOKEN` | unset                        | IBM Quantum Runtime API token (also accepts unprefixed `IBM_QUANTUM_TOKEN`)   |
+| `IBM_QUANTUM_TOKEN`         | unset                        | legacy/unprefixed alias for the token above                                   |
+| `AWS_ACCESS_KEY_ID`         | unset                        | resolved by boto3's standard credential chain, not read directly by qscrape   |
+| `AWS_SECRET_ACCESS_KEY`     | unset                        | see above                                                                      |
+| `AWS_REGION`                | unset                        | see above                                                                      |
+
+Per-source `cache_max_age` / `request_delay` overrides in `config/sources.json`
+still take precedence over the `QSCRAPE_CACHE_MAX_AGE` / `QSCRAPE_REQUEST_DELAY`
+settings-level defaults -- unchanged behavior, just a different fallback layer.
+
+## Tooling rationale
+
+| Tool                | Why                                                                                            |
+|----------------------|--------------------------------------------------------------------------------------------------|
+| `uv`                 | single fast tool for venv + dependency resolution + lockfile (`uv.lock`); replaces pip/venv       |
+| `ruff`               | lint + format in one binary; replaces flake8/isort/black                                          |
+| `mypy --strict`      | catches type errors in the provenance/normalization logic before they hit `data/backends.json`    |
+| `pytest`             | fixtures + `--cov`, clearer failure output than `unittest`                                        |
+| `nox`                | reproducible lint/typecheck/test sessions across Python 3.12 and 3.13, locally and in CI           |
+| `pre-commit`         | catches lint/format issues before they reach CI                                                   |
+| `pydantic-settings`  | one typed, testable settings object instead of scattered `os.environ.get(...)` calls              |
+| `structlog`          | structured (JSON or console) logs for internal diagnostics, without touching the CLI's plain-text run summary |
+
+## Running the checks
+
+```bash
+uv run ruff check .          # lint
+uv run ruff format --check . # formatting
+uv run mypy src               # strict type checking
+uv run pytest                 # tests + coverage
+
+# or, via nox (what CI runs):
+uv run nox -s lint typecheck tests
+```
 
 ## Where the data actually comes from
 
@@ -56,8 +121,11 @@ purpose; this is a competitor-only view.
 
 ## How it's put together
 
-- `qscrape/` — the pipeline. `config/sources.json` holds all the per-vendor rules;
-  the code is generic and just executes them.
+- `src/qscrape/` — the pipeline (standard `src/` layout). `config/sources.json`
+  holds all the per-vendor rules; the code is generic and just executes them.
+- `tests/unit/` — the pytest suite, one file per module under test, with shared
+  fixtures (e.g. `fake_http_factory`) in `tests/conftest.py`. Run with
+  `uv run pytest` or `uv run nox -s tests`.
 - Each value is stored with its provenance (value + source + date + method), and
   the schema in `schema/backend.schema.json` is checked on every run.
 - When two sources describe the same backend, the higher-priority one wins
