@@ -19,13 +19,13 @@ doesn't provide is simply left blank (never invented).
 from __future__ import annotations
 
 import contextlib
-import os
 import statistics
 from collections.abc import Iterable
 from typing import Any
 
 from ..models import BackendRecord, F, now_iso
 from ..normalize import apply_fidelity_stats
+from ..settings import get_settings
 from .base import Adapter
 
 _SRC = "https://quantum.cloud.ibm.com/"
@@ -39,7 +39,7 @@ class IBMAdapter(Adapter):
     tier = "calibration-api"
 
     def fetch(self) -> Iterable[BackendRecord]:
-        token = self.config.get("token") or os.environ.get("IBM_QUANTUM_TOKEN")
+        token = self.config.get("token") or get_settings().ibm_quantum_token
         if not token:
             return self._skip("No IBM_QUANTUM_TOKEN; skipping IBM calibration pull.")
 

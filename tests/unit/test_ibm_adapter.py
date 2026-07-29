@@ -10,6 +10,7 @@ from typing import Any, ClassVar
 import pytest
 
 from qscrape.adapters.ibm import IBMAdapter
+from qscrape.settings import get_settings
 
 
 class _Gate:
@@ -109,6 +110,7 @@ class TestIBMAdapter:
 
     def test_no_token_is_clean_skip(self) -> None:
         tok = os.environ.pop("IBM_QUANTUM_TOKEN", None)
+        get_settings.cache_clear()
         try:
             assert IBMAdapter(None, {}).fetch() == []  # silent  # type: ignore[arg-type]
             recs = IBMAdapter(None, {"emit_skips": True}).fetch()  # warns  # type: ignore[arg-type]
@@ -116,3 +118,4 @@ class TestIBMAdapter:
         finally:
             if tok is not None:
                 os.environ["IBM_QUANTUM_TOKEN"] = tok
+            get_settings.cache_clear()

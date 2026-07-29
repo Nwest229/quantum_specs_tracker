@@ -21,8 +21,8 @@ from typing import Any
 
 from .httpcache import HttpCache
 from .pipeline import Pipeline
+from .settings import get_settings
 
-ROOT = Path(__file__).parent.parent.parent
 _SENTINEL = object()
 
 
@@ -41,11 +41,13 @@ def _filter_config(config: dict[str, Any], only: list[str]) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    settings = get_settings()
+
     p = argparse.ArgumentParser(
         prog="qscrape", description="Build the combined quantum-backend JSON array."
     )
-    p.add_argument("--config", default=str(ROOT / "config" / "sources.json"))
-    p.add_argument("--out", default=str(ROOT / "data" / "backends.json"))
+    p.add_argument("--config", default=str(settings.config_path))
+    p.add_argument("--out", default=str(settings.out_path))
     p.add_argument("--no-cache", action="store_true")
     p.add_argument("--only", action="append", default=[])
     p.add_argument("--quiet", action="store_true")
@@ -62,8 +64,9 @@ def main(argv: list[str] | None = None) -> int:
         config = _filter_config(json.load(fh), args.only)
 
     http = HttpCache(
-        max_age=0 if args.no_cache else config.get("cache_max_age", 86400),
-        delay=config.get("request_delay", 1.0),
+        cache_dir=settings.cache_dir,
+        max_age=0 if args.no_cache else config.get("cache_max_age", settings.cache_max_age),
+        delay=config.get("request_delay", settings.request_delay),
     )
     pipe = Pipeline(config, http=http)
     docs = pipe.run()
@@ -73,9 +76,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.xlsx is not None:
         from .export_xlsx import write_workbook
 
-        xlsx_path = (
-            str(ROOT / "data" / "quantum_tracker.xlsx") if args.xlsx is _SENTINEL else args.xlsx
-        )
+        xlsx_path = str(settings.xlsx_path) if args.xlsx is _SENTINEL else args.xlsx
         write_workbook(docs, xlsx_path)
 
     rep = pipe.report
