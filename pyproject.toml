@@ -53,7 +53,10 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "ANN", "C4", "PTH"]
-ignore = []
+# ANN401: this codebase is glue code around dynamically-typed third-party SDK
+# objects (qiskit-ibm-runtime, amazon-braket-sdk) and untyped JSON config; a
+# blanket ban on `Any` would force misleading, non-load-bearing annotations.
+ignore = ["ANN401"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "PTH"]

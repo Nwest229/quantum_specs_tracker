@@ -1,13 +1,13 @@
 """Normalisation helpers and derived-metric computation."""
+
 from __future__ import annotations
 
-import math
 import re
 import statistics
-from typing import Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
-from .models import UNKNOWN, BackendRecord, Field, F
-
+from .models import UNKNOWN, BackendRecord, F, Field
 
 # ---------------------------------------------------------------------------
 # Parsing helpers
@@ -15,7 +15,7 @@ from .models import UNKNOWN, BackendRecord, Field, F
 _NUM_RE = re.compile(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
 
 
-def parse_number(text) -> Optional[float]:
+def parse_number(text: Any) -> float | None:
     """Pull the first number out of a string; returns None if none present."""
     if text is None:
         return None
@@ -25,7 +25,7 @@ def parse_number(text) -> Optional[float]:
     return float(m.group()) if m else None
 
 
-def parse_percent_as_fraction(text) -> Optional[float]:
+def parse_percent_as_fraction(text: Any) -> float | None:
     """'99.7%' -> 0.997 ; '0.997' -> 0.997 ; '99.7' -> 0.997."""
     n = parse_number(text)
     if n is None:
@@ -38,7 +38,7 @@ def parse_percent_as_fraction(text) -> Optional[float]:
 # ---------------------------------------------------------------------------
 # Fidelity statistics from a per-gate calibration dump
 # ---------------------------------------------------------------------------
-def fidelity_stats(fidelities: Iterable[float]) -> dict:
+def fidelity_stats(fidelities: Iterable[float | None]) -> dict[str, float]:
     vals = [v for v in fidelities if v is not None]
     if not vals:
         return {}
@@ -51,16 +51,21 @@ def fidelity_stats(fidelities: Iterable[float]) -> dict:
     }
 
 
-def apply_fidelity_stats(record: BackendRecord, two_q: Iterable[float],
-                         one_q: Optional[Iterable[float]] = None,
-                         spam: Optional[Iterable[float]] = None,
-                         source: str = "", retrieved: str = "",
-                         kind: str = "calibration-api") -> None:
+def apply_fidelity_stats(
+    record: BackendRecord,
+    two_q: Iterable[float | None],
+    one_q: Iterable[float | None] | None = None,
+    spam: Iterable[float | None] | None = None,
+    source: str = "",
+    retrieved: str = "",
+    kind: str = "calibration-api",
+) -> None:
     """Populate fidelity.* leaves from raw per-gate calibration lists.
 
     Only used when a vendor exposes every gate (IBM, Rigetti, cloud APIs).
     """
-    def put(path, value, method):
+
+    def put(path: str, value: float | None, method: str) -> None:
         if value is not None:
             record.set(path, F(round(value, 6), source, retrieved, method, kind))
 
@@ -103,8 +108,14 @@ def compute_theoretical_max(record: BackendRecord) -> None:
     n_field: Field = record.qpu_topology.get("qubits", Field())
     # Prefer average; fall back to median then min so vendors that only publish
     # a summary statistic still get a (clearly-labelled) headroom estimate.
-    f2q_field = next((record.fidelity[k] for k in ("2q_avg", "2q_median", "2q_min")
-                      if record.fidelity.get(k, Field()).known), Field())
+    f2q_field = next(
+        (
+            record.fidelity[k]
+            for k in ("2q_avg", "2q_median", "2q_min")
+            if record.fidelity.get(k, Field()).known
+        ),
+        Field(),
+    )
 
     N = parse_number(n_field.value) if n_field.known else None
     f2q = parse_percent_as_fraction(f2q_field.value) if f2q_field.known else None
@@ -120,23 +131,31 @@ def compute_theoretical_max(record: BackendRecord) -> None:
 
     eps = 1.0 - f2q
     exponent = min(N, 1.0 / eps)
-    value = 2.0 ** exponent
+    value = 2.0**exponent
 
     record.derived_metrics["theoretical_max"] = {
         "value": value,
         "log2_value": exponent,
         "formula": "2 ** min(N, 1/eps_2q); eps_2q = 1 - F_2q",
-        "inputs": {"N": N, "F_2q": f2q, "F_2q_stat": f2q_field.method or "unknown",
-                   "eps_2q": eps, "exponent": exponent},
-        "caveat": ("Rough headroom proxy only: conflates circuit width (N) with "
-                   "depth (1/eps). Not a substitute for measured Quantum Volume."),
+        "inputs": {
+            "N": N,
+            "F_2q": f2q,
+            "F_2q_stat": f2q_field.method or "unknown",
+            "eps_2q": eps,
+            "exponent": exponent,
+        },
+        "caveat": (
+            "Rough headroom proxy only: conflates circuit width (N) with "
+            "depth (1/eps). Not a substitute for measured Quantum Volume."
+        ),
     }
     # Mirror into the top-level provValue field.
     record.theoretical_max = F(
         value=value,
         source=f2q_field.source or n_field.source,
         retrieved=f2q_field.retrieved or n_field.retrieved,
-        method="theoretical", kind="computed",
+        method="theoretical",
+        kind="computed",
     )
 
 

@@ -15,11 +15,14 @@ Without a token (or without the SDK installed) it is a clean no-op that only
 emits a skip warning. Every extracted field carries provenance; anything the API
 doesn't provide is simply left blank (never invented).
 """
+
 from __future__ import annotations
 
+import contextlib
 import os
 import statistics
-from typing import Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
 from ..models import BackendRecord, F, now_iso
 from ..normalize import apply_fidelity_stats
@@ -41,38 +44,39 @@ class IBMAdapter(Adapter):
             return self._skip("No IBM_QUANTUM_TOKEN; skipping IBM calibration pull.")
 
         try:
-            from qiskit_ibm_runtime import QiskitRuntimeService  # type: ignore
+            from qiskit_ibm_runtime import QiskitRuntimeService
         except ImportError:
             return self._skip("qiskit-ibm-runtime not installed.")
 
         # Any connection/auth/SSL failure must degrade to a skip, never crash the
         # whole build — IBM is an optional enrichment tier.
         try:
-            kwargs = {"channel": "ibm_quantum_platform", "token": token}
-            instance = self.config.get("instance")   # optional CRN for the new platform
+            kwargs: dict[str, Any] = {"channel": "ibm_quantum_platform", "token": token}
+            instance = self.config.get("instance")  # optional CRN for the new platform
             if instance:
                 kwargs["instance"] = instance
             service = QiskitRuntimeService(**kwargs)
-            wanted = set(self.config.get("backends", []))
-            out = []
+            wanted = set(self.config.get("backends") or [])
+            out: list[BackendRecord] = []
             for backend in service.backends(operational=True):
                 if wanted and backend.name not in wanted:
                     continue
                 try:
                     out.append(self._to_record(backend))
-                except Exception as e:  # noqa: BLE001 - skip one bad device, keep the rest
+                except Exception as e:
                     self.report_backend_error(backend, e)
             return out
-        except Exception as e:  # noqa: BLE001
-            return self._skip(f"IBM API call failed ({type(e).__name__}): "
-                              f"{str(e)[:200]}")
+        except Exception as e:
+            return self._skip(f"IBM API call failed ({type(e).__name__}): {str(e)[:200]}")
 
-    def report_backend_error(self, backend, err) -> None:
+    def report_backend_error(self, backend: Any, err: BaseException) -> None:
         # best-effort: note a single device we couldn't parse, without failing the run
         name = getattr(backend, "name", "?")
-        self.config.setdefault("_warnings", []).append(f"IBM {name}: {err}")
+        warnings = self.config.setdefault("_warnings", [])
+        assert isinstance(warnings, list)
+        warnings.append(f"IBM {name}: {err}")
 
-    def _skip(self, msg: str):
+    def _skip(self, msg: str) -> list[BackendRecord]:
         if not self.config.get("emit_skips"):
             return []
         rec = BackendRecord(backend_name="__ibm_unavailable__", vendor="ibm")
@@ -80,7 +84,7 @@ class IBMAdapter(Adapter):
         rec.meta["skipped"] = True
         return [rec]
 
-    def _to_record(self, backend) -> BackendRecord:
+    def _to_record(self, backend: Any) -> BackendRecord:
         retrieved = now_iso()
         # Clean the cloud id ("ibm_kingston") to the same display name the CSV
         # importer produces ("IBM Kingston"), so live API rows MERGE with (and,
@@ -90,7 +94,7 @@ class IBMAdapter(Adapter):
         src = f"{_SRC} (backend={backend.name})"
         tier = self.tier
 
-        def put(path: str, val, method: str) -> None:
+        def put(path: str, val: Any, method: str) -> None:
             if val is not None:
                 rec.set(path, F(val, src, retrieved, method, tier))
 
@@ -131,16 +135,15 @@ class IBMAdapter(Adapter):
 
         spam, ro_t = [], []
         for qi in range(getattr(backend, "num_qubits", 0)):
-            try:
+            with contextlib.suppress(Exception):
                 spam.append(1.0 - props.readout_error(qi))
-            except Exception:  # noqa: BLE001
-                pass
             rl = _call(props, "readout_length", qi)
             if rl is not None:
                 ro_t.append(rl)
 
-        apply_fidelity_stats(rec, two_q_f, one_q_f, spam, source=src,
-                             retrieved=retrieved, kind=tier)
+        apply_fidelity_stats(
+            rec, two_q_f, one_q_f, spam, source=src, retrieved=retrieved, kind=tier
+        )
 
         # ---- operation speed (median gate/readout durations, seconds) --
         put("operation_speed.2q_gate_time_s", _median(two_q_t), "median")
@@ -164,26 +167,26 @@ def _clean_name(raw: str) -> str:
     return n
 
 
-def _safe(fn):
+def _safe(fn: Any) -> Any:
     if not callable(fn):
         return None
     try:
         return fn()
-    except Exception:  # noqa: BLE001
+    except Exception:
         return None
 
 
-def _call(obj, name, *args):
+def _call(obj: Any, name: str, *args: Any) -> Any:
     fn = getattr(obj, name, None)
     if not callable(fn):
         return None
     try:
         return fn(*args)
-    except Exception:  # noqa: BLE001
+    except Exception:
         return None
 
 
-def _edge_count(backend) -> Optional[int]:
+def _edge_count(backend: Any) -> int | None:
     """Number of *undirected* coupling-map edges."""
     cmap = getattr(backend, "coupling_map", None)
     if cmap is None:
@@ -195,15 +198,16 @@ def _edge_count(backend) -> Optional[int]:
     return len(pairs) or None
 
 
-def _gate_fidelity(props, gate) -> Optional[float]:
+def _gate_fidelity(props: Any, gate: Any) -> float | None:
     err = _call(props, "gate_error", getattr(gate, "gate", None), getattr(gate, "qubits", None))
     return (1.0 - err) if err is not None else None
 
 
-def _gate_length(props, gate) -> Optional[float]:
-    return _call(props, "gate_length", getattr(gate, "gate", None), getattr(gate, "qubits", None))
+def _gate_length(props: Any, gate: Any) -> float | None:
+    length = _call(props, "gate_length", getattr(gate, "gate", None), getattr(gate, "qubits", None))
+    return float(length) if length is not None else None
 
 
-def _median(vals) -> Optional[float]:
-    vals = [v for v in vals if v is not None]
-    return round(statistics.median(vals), 12) if vals else None
+def _median(vals: Iterable[float | None]) -> float | None:
+    cleaned = [v for v in vals if v is not None]
+    return round(statistics.median(cleaned), 12) if cleaned else None

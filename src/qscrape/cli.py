@@ -10,49 +10,61 @@ Flags:
     --quiet         suppress the per-run summary
     --xlsx [PATH]   also write an Excel workbook (default data/quantum_tracker.xlsx)
 """
+
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
+from pathlib import Path
+from typing import Any
 
 from .httpcache import HttpCache
 from .pipeline import Pipeline
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+ROOT = Path(__file__).parent.parent.parent
 _SENTINEL = object()
 
 
-def _filter_config(config: dict, only: list[str]) -> dict:
+def _filter_config(config: dict[str, Any], only: list[str]) -> dict[str, Any]:
     if not only:
         return config
-    only = {o.lower() for o in only}
+    only_set = {o.lower() for o in only}
     config = dict(config)
-    config["api_sources"] = {k: v for k, v in config.get("api_sources", {}).items()
-                             if k.lower() in only}
-    config["spec_sources"] = [e for e in config.get("spec_sources", [])
-                              if e.get("vendor", "").lower() in only]
+    config["api_sources"] = {
+        k: v for k, v in config.get("api_sources", {}).items() if k.lower() in only_set
+    }
+    config["spec_sources"] = [
+        e for e in config.get("spec_sources", []) if e.get("vendor", "").lower() in only_set
+    ]
     return config
 
 
-def main(argv=None) -> int:
-    p = argparse.ArgumentParser(prog="qscrape",
-                                description="Build the combined quantum-backend JSON array.")
-    p.add_argument("--config", default=os.path.join(ROOT, "config", "sources.json"))
-    p.add_argument("--out", default=os.path.join(ROOT, "data", "backends.json"))
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(
+        prog="qscrape", description="Build the combined quantum-backend JSON array."
+    )
+    p.add_argument("--config", default=str(ROOT / "config" / "sources.json"))
+    p.add_argument("--out", default=str(ROOT / "data" / "backends.json"))
     p.add_argument("--no-cache", action="store_true")
     p.add_argument("--only", action="append", default=[])
     p.add_argument("--quiet", action="store_true")
-    p.add_argument("--xlsx", nargs="?", const=_SENTINEL, default=None,
-                   help="write an .xlsx workbook (optional path; default data/quantum_tracker.xlsx)")
+    p.add_argument(
+        "--xlsx",
+        nargs="?",
+        const=_SENTINEL,
+        default=None,
+        help="write an .xlsx workbook (optional path; default data/quantum_tracker.xlsx)",
+    )
     args = p.parse_args(argv)
 
-    with open(args.config, encoding="utf-8") as fh:
+    with Path(args.config).open(encoding="utf-8") as fh:
         config = _filter_config(json.load(fh), args.only)
 
-    http = HttpCache(max_age=0 if args.no_cache else config.get("cache_max_age", 86400),
-                     delay=config.get("request_delay", 1.0))
+    http = HttpCache(
+        max_age=0 if args.no_cache else config.get("cache_max_age", 86400),
+        delay=config.get("request_delay", 1.0),
+    )
     pipe = Pipeline(config, http=http)
     docs = pipe.run()
     pipe.write(docs, args.out)
@@ -60,16 +72,21 @@ def main(argv=None) -> int:
     xlsx_path = None
     if args.xlsx is not None:
         from .export_xlsx import write_workbook
-        xlsx_path = (os.path.join(ROOT, "data", "quantum_tracker.xlsx")
-                     if args.xlsx is _SENTINEL else args.xlsx)
+
+        xlsx_path = (
+            str(ROOT / "data" / "quantum_tracker.xlsx") if args.xlsx is _SENTINEL else args.xlsx
+        )
         write_workbook(docs, xlsx_path)
 
     rep = pipe.report
     if not args.quiet:
-        print(f"backends: {rep['counts'].get('backends', 0)}  "
-              f"vendors: {rep['counts'].get('vendors', 0)}")
-        print(f"warnings: {len(rep['warnings'])}  "
-              f"validation errors: {len(rep['validation_errors'])}")
+        print(
+            f"backends: {rep['counts'].get('backends', 0)}  "
+            f"vendors: {rep['counts'].get('vendors', 0)}"
+        )
+        print(
+            f"warnings: {len(rep['warnings'])}  validation errors: {len(rep['validation_errors'])}"
+        )
         for w in rep["warnings"][:20]:
             print("  warn:", w)
         for e in rep["validation_errors"][:20]:

@@ -8,9 +8,11 @@ credentials are present; otherwise it is a no-op that explains what's missing.
 
 No values are invented: everything comes from the live device document.
 """
+
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from ..models import BackendRecord, F, now_iso
 from .base import Adapter
@@ -24,19 +26,21 @@ class BraketAdapter(Adapter):
 
     def fetch(self) -> Iterable[BackendRecord]:
         try:
-            from braket.aws import AwsDevice  # type: ignore
+            from braket.aws import AwsDevice
         except ImportError:
             rec = BackendRecord(backend_name="__braket_unavailable__", vendor="aws-braket")
-            self.warn(rec, "amazon-braket-sdk not installed; skipping. "
-                           "pip install amazon-braket-sdk and configure AWS creds.")
+            self.warn(
+                rec,
+                "amazon-braket-sdk not installed; skipping. "
+                "pip install amazon-braket-sdk and configure AWS creds.",
+            )
             rec.meta["skipped"] = True
             return [rec] if self.config.get("emit_skips") else []
 
         arns = self.config.get("device_arns")
         try:
-            devices = ([AwsDevice(a) for a in arns] if arns
-                       else AwsDevice.get_devices(types=["QPU"]))
-        except Exception as e:  # noqa: BLE001 - AWS raises many creds/network errors
+            devices = [AwsDevice(a) for a in arns] if arns else AwsDevice.get_devices(types=["QPU"])
+        except Exception as e:
             rec = BackendRecord(backend_name="__braket_error__", vendor="aws-braket")
             self.warn(rec, f"Braket device listing failed: {e}")
             rec.meta["skipped"] = True
@@ -46,14 +50,13 @@ class BraketAdapter(Adapter):
         for dev in devices:
             try:
                 out.append(self._to_record(dev))
-            except Exception as e:  # noqa: BLE001
-                rec = BackendRecord(backend_name=getattr(dev, "name", "?"),
-                                    vendor="aws-braket")
+            except Exception as e:
+                rec = BackendRecord(backend_name=getattr(dev, "name", "?"), vendor="aws-braket")
                 self.warn(rec, f"parse failed: {e}")
                 out.append(rec)
         return out
 
-    def _to_record(self, dev) -> BackendRecord:
+    def _to_record(self, dev: Any) -> BackendRecord:
         retrieved = now_iso()
         provider = getattr(dev, "provider_name", "") or ""
         # Prefix the provider so Braket's bare device name ("Garnet") becomes the
@@ -68,7 +71,7 @@ class BraketAdapter(Adapter):
 
         try:
             props = dev.properties.dict() if hasattr(dev.properties, "dict") else {}
-        except Exception:  # noqa: BLE001 - some providers (IonQ) mangle .dict() keys
+        except Exception:
             props = {}
         # qubit count / topology
         paradigm = props.get("paradigm", {}) or {}
@@ -82,7 +85,9 @@ class BraketAdapter(Adapter):
         self._extract_calibration(rec, props.get("provider", {}) or {}, retrieved)
         return rec
 
-    def _extract_calibration(self, rec, provider: dict, retrieved: str) -> None:
+    def _extract_calibration(
+        self, rec: BackendRecord, provider: dict[str, Any], retrieved: str
+    ) -> None:
         """Pull fidelity/edges from the (provider-specific) capabilities block.
 
         Each vendor nests it differently, e.g. IQM under provider.properties.
@@ -93,7 +98,7 @@ class BraketAdapter(Adapter):
         if not isinstance(provider, dict):
             return
 
-        def put(path, val, method):
+        def put(path: str, val: Any, method: str) -> None:
             if val is not None:
                 rec.set(path, F(val, _SRC, retrieved, method, self.tier))
 
@@ -109,7 +114,8 @@ class BraketAdapter(Adapter):
             put("operation_speed.2q_gate_time_s", _num(timing.get("2Q")), "vendor-spec")
             put("operation_speed.readout_time_s", _num(timing.get("readout")), "vendor-spec")
 
-        specs = provider.get("specs") if isinstance(provider.get("specs"), dict) else {}
+        specs_raw = provider.get("specs")
+        specs: dict[str, Any] = specs_raw if isinstance(specs_raw, dict) else {}
         # Rigetti exposes the coupling map as specs.architecture.edges
         arch = specs.get("architecture") if isinstance(specs, dict) else None
         if isinstance(arch, dict) and isinstance(arch.get("edges"), list) and arch["edges"]:
@@ -129,31 +135,34 @@ class BraketAdapter(Adapter):
         f2 += r2
         spam += rspam
 
-        def stats(prefix, vals):
+        def stats(prefix: str, vals: list[float]) -> None:
             if not vals:
                 return
             put(f"fidelity.{prefix}_avg", round(sum(vals) / len(vals), 6), "average")
             put(f"fidelity.{prefix}_max", round(max(vals), 6), "maximum")
             put(f"fidelity.{prefix}_min", round(min(vals), 6), "minimum")
+
         stats("1q", f1)
         stats("2q", f2)
         if spam:
             put("fidelity.spam_avg", round(sum(spam) / len(spam), 6), "average")
 
 
-def _rigetti_bench(specs) -> tuple:
+def _rigetti_bench(specs: dict[str, Any]) -> tuple[list[float], list[float], list[float]]:
     """Rigetti specs.benchmarks -> (1Q, 2Q, SPAM) fidelity lists.
 
     Each benchmark carries node_count (1 or 2) and per-site characteristics like
     {'name': 'fRB'/'fCZ'/'fRO', 'value': 0.996}; node_count buckets 1Q vs 2Q.
     """
-    f1, f2, spam = [], [], []
-    for bench in (specs.get("benchmarks") or []):
+    f1: list[float] = []
+    f2: list[float] = []
+    spam: list[float] = []
+    for bench in specs.get("benchmarks") or []:
         if not isinstance(bench, dict):
             continue
         nc = bench.get("node_count")
-        for site in (bench.get("sites") or []):
-            for ch in (site.get("characteristics") or []):
+        for site in bench.get("sites") or []:
+            for ch in site.get("characteristics") or []:
                 name, val = ch.get("name"), ch.get("value")
                 if not isinstance(val, (int, float)):
                     continue
@@ -166,18 +175,18 @@ def _rigetti_bench(specs) -> tuple:
     return f1, f2, spam
 
 
-def _mean(block):
+def _mean(block: Any) -> float | None:
     """IonQ-style aggregate: {'mean': 0.9998} -> 0.9998."""
     if isinstance(block, dict) and isinstance(block.get("mean"), (int, float)):
         return round(float(block["mean"]), 6)
     return None
 
 
-def _num(v):
+def _num(v: Any) -> float | None:
     return float(v) if isinstance(v, (int, float)) else None
 
 
-def _block(inner, keys) -> dict:
+def _block(inner: Any, keys: tuple[str, ...]) -> dict[str, Any]:
     """First non-empty dict among candidate key names."""
     if not isinstance(inner, dict):
         return {}
@@ -188,9 +197,9 @@ def _block(inner, keys) -> dict:
     return {}
 
 
-def _vals(block, keys) -> list:
+def _vals(block: Any, keys: tuple[str, ...]) -> list[float]:
     """Collect the first matching numeric fidelity from each per-qubit/-pair entry."""
-    out = []
+    out: list[float] = []
     if not isinstance(block, dict):
         return out
     for entry in block.values():

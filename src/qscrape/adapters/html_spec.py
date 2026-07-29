@@ -30,24 +30,27 @@ Extraction rule keys:
     method     statistic kind stored on the Field
     source     override source URL (else the page url is used)
 """
+
 from __future__ import annotations
 
 import json
 import re
-from typing import Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
-from ..models import BackendRecord, Field, F, UNKNOWN, _SCALAR_META
+from ..models import _SCALAR_META, BackendRecord, F
 from ..normalize import parse_number, parse_percent_as_fraction
 from .base import Adapter
 
 try:
-    from bs4 import BeautifulSoup  # type: ignore
+    from bs4 import BeautifulSoup
+
     _HAVE_BS4 = True
 except ImportError:  # pragma: no cover
     _HAVE_BS4 = False
 
 
-def _coerce(raw: Any, how: str):
+def _coerce(raw: Any, how: str) -> Any:
     if raw is None:
         return None
     how = how or "str"
@@ -90,7 +93,7 @@ def _json_path(doc: Any, path: str) -> Any:
 class HtmlSpecAdapter(Adapter):
     """Instantiated once per backend entry in the config."""
 
-    def __init__(self, http, config: dict):
+    def __init__(self, http: Any, config: dict[str, Any]) -> None:
         super().__init__(http, config)
         self.vendor = config.get("vendor", "")
         self.tier = config.get("tier", "vendor")
@@ -104,8 +107,10 @@ class HtmlSpecAdapter(Adapter):
 
         # Only hit the network if some rule actually reads the page. Pure-const
         # entries (values verified by hand, each with its own source) don't.
-        needs_page = any(any(k in rule for k in ("regex", "selector", "json_path"))
-                         for rule in cfg.get("fields", {}).values())
+        needs_page = any(
+            any(k in rule for k in ("regex", "selector", "json_path"))
+            for rule in cfg.get("fields", {}).values()
+        )
         url = cfg.get("url", "")
         page_text = ""
         soup = None
@@ -152,14 +157,20 @@ class HtmlSpecAdapter(Adapter):
                 method=rule.get("method", "vendor-spec"),
                 # A const verified against an explicit source carries that
                 # source's tier; an unsourced const is a bare assertion.
-                kind=("config-asserted" if (is_const and not rule.get("source"))
-                      else self.tier),
+                kind=("config-asserted" if (is_const and not rule.get("source")) else self.tier),
             )
             rec.set(dotted, fld)
 
         yield rec
 
-    def _extract(self, rule: dict, text: str, soup, doc, rec: BackendRecord) -> Optional[str]:
+    def _extract(
+        self,
+        rule: dict[str, Any],
+        text: str,
+        soup: Any,
+        doc: Any,
+        rec: BackendRecord,
+    ) -> Any:
         if "const" in rule:
             return rule["const"]
         if "json_path" in rule:
