@@ -31,7 +31,7 @@ jobs:
       - name: Poll qBraid + refresh report
         env:
           QBRAID_API_KEY: ${{ secrets.QBRAID_API_KEY }}
-        run: python -m qscrape.uptime poll --quiet
+        run: python -m qscrape.uptime poll
 
       - name: Commit updated log + report
         run: |
