@@ -26,6 +26,10 @@
   h2{font-size:14px;color:var(--muted);font-weight:600;margin:24px 0 10px;text-transform:uppercase;letter-spacing:.04em;}
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px;}
   .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .rangebar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+  .rangebtn{background:var(--chip);color:var(--muted);border:1px solid var(--line);padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12.5px;}
+  .rangebtn:hover{border-color:var(--accent);}
+  .rangebtn.active{border-color:var(--accent);color:var(--accent);}
   .track{margin-bottom:6px;}
   .track .lbl{font-size:12.5px;color:var(--fg);margin-bottom:2px;}
   table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;margin-top:6px;}
@@ -57,6 +61,7 @@
   <div class="cards" id="cards"></div>
 
   <h2>Uptime timeline</h2>
+  <div class="rangebar" id="rangebar"></div>
   <div class="legend">
     <span><i style="background:var(--up)"></i>online</span>
     <span><i style="background:#b5545e"></i>outage (no schedule)</span>
@@ -73,68 +78,103 @@
 <div class="tip" id="tip"></div>
 
 <script>
-let REPORT=null;
+let REPORT=null, RANGE="all";
+const RANGES={day:864e5, week:6048e5, month:2592e6, year:31536e6, all:null};
+const RANGE_LABELS={day:"Past day", week:"Past week", month:"Past month", year:"Past year", all:"All data"};
 const CLS_COLOR={unscheduled:"var(--unsched)", scheduled:"var(--sched)", "off-hours":"var(--off)", outage:"#b5545e"};
 
 function statusColor(s){ return (s==="ONLINE") ? "var(--up)" : (/(POLL_ERROR|UNKNOWN|NOT_FOUND)/.test(s) ? "var(--off)" : "var(--unsched)"); }
-function fmtDur(sec){ if(sec==null) return "—"; const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);
-  return h? `${h}h ${m}m` : (m? `${m}m` : `${sec}s`); }
+function fmtDur(sec){ if(sec==null) return "—";
+  const d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+  return d? `${d}d ${h}h` : (h? `${h}h ${m}m` : (m? `${m}m` : `${sec}s`)); }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
 
 function render(){
   if(!REPORT){ return; }
   document.getElementById("subtitle").textContent =
-    `generated ${REPORT.generated} · window ${(REPORT.window.from||"—").slice(0,16)} → ${(REPORT.window.to||"—").slice(0,16)}`;
-  renderCards();
-  renderTimeline();
-  renderUnscheduled();
+    `generated ${(REPORT.generated||"").slice(0,16)} · ${REPORT.devices.length} devices · data from ${(REPORT.window.from||"—").slice(0,10)}`;
+  renderRangeBar();
+  renderView();
+}
+function renderView(){ renderCards(); renderTimeline(); renderOutages(); }
+
+function renderRangeBar(){
+  const bar=document.getElementById("rangebar");
+  bar.innerHTML=Object.keys(RANGES).map(k=>
+    `<button class="rangebtn${k===RANGE?' active':''}" data-r="${k}">${RANGE_LABELS[k]}</button>`).join("");
+  bar.querySelectorAll(".rangebtn").forEach(b=> b.onclick=()=>{ RANGE=b.dataset.r; renderRangeBar(); renderView(); });
 }
 
+// selected range [from,to] plus the observed-data overlap [covFrom,covTo], in ms
+function rangeWindow(){
+  const to=Date.parse(REPORT.window.to), wf=Date.parse(REPORT.window.from);
+  const from=(RANGE==="all"||!RANGES[RANGE]) ? wf : to-RANGES[RANGE];
+  return {from, to, covFrom:Math.max(from,wf), covTo:to};
+}
+function downSeconds(d,a,b){ let s=0;
+  (d.intervals||[]).forEach(iv=>{ const x=Math.max(a,Date.parse(iv.start)), y=Math.min(b,Date.parse(iv.end)); if(y>x) s+=(y-x)/1000; });
+  return s; }
+
 function renderCards(){
+  const {covFrom,covTo}=rangeWindow(); const effSpan=(covTo-covFrom)/1000;
   document.getElementById("cards").innerHTML = REPORT.devices.map(d=>{
     const c=statusColor(d.current_status);
+    const up = effSpan>0 ? Math.round((1-downSeconds(d,covFrom,covTo)/effSpan)*10000)/100 : null;
     return `<div class="card">
       <div class="dev">${esc(d.device)}</div>
       <div class="st"><span class="dot" style="background:${c}"></span>${esc(d.current_status)}</div>
-      <div class="big">${d.uptime_pct==null?"—":d.uptime_pct+"%"}</div>
-      <div class="muted" style="font-size:12px">uptime over window · ${d.samples} samples</div>
+      <div class="big">${up==null?"—":up+"%"}</div>
+      <div class="muted" style="font-size:12px">uptime · ${RANGE_LABELS[RANGE].toLowerCase()}</div>
       <div class="muted" style="font-size:12px">last seen ${esc((d.last_seen||"").slice(0,16))}</div>
     </div>`;
   }).join("") || `<div class="empty">No devices in the report yet.</div>`;
 }
 
+function fmtAxis(ms){ const iso=new Date(ms).toISOString();
+  return (RANGE==="day") ? iso.slice(5,16).replace("T"," ") : iso.slice(0,10); }
+
 function renderTimeline(){
   const el=document.getElementById("timeline");
-  const t0=Date.parse(REPORT.window.from), t1=Date.parse(REPORT.window.to);
-  if(!(t1>t0)){ el.innerHTML=`<div class="empty">Not enough data for a timeline yet — the poller needs a few samples.</div>`; return; }
-  const W=Math.min(1000,(document.body.clientWidth||1000)-60), H=34, m={l:120,r:12};
+  const wf=Date.parse(REPORT.window.from), wt=Date.parse(REPORT.window.to);
+  if(!(wt>wf)){ el.innerHTML=`<div class="empty">Not enough data for a timeline yet — the poller needs a few samples.</div>`; return; }
+  const {from,to,covFrom,covTo}=rangeWindow(); const span=(to-from)||1;
+  const W=Math.min(1000,(document.body.clientWidth||1000)-60), H=34, m={l:150,r:14};
   const iw=W-m.l-m.r;
-  const px=t=> m.l + (Date.parse(t)-t0)/(t1-t0)*iw;
+  const px=ms=> m.l + Math.max(0,Math.min(1,(ms-from)/span))*iw;
   el.innerHTML = REPORT.devices.map(d=>{
-    let bars=`<rect x="${m.l}" y="8" width="${iw}" height="16" rx="3" fill="var(--up)" opacity="0.28"/>`;
+    // grey = no data over the range; green = observed & online; coloured = down intervals
+    let bars=`<rect x="${m.l}" y="8" width="${iw}" height="16" rx="3" fill="var(--off)" opacity="0.16"/>`;
+    const gx=px(covFrom), gw=px(covTo)-px(covFrom);
+    if(gw>0) bars+=`<rect x="${gx}" y="8" width="${gw}" height="16" rx="3" fill="var(--up)" opacity="0.30"/>`;
     (d.intervals||[]).forEach(iv=>{
-      const x=px(iv.start), w=Math.max(2, px(iv.end)-px(iv.start));
-      const col=CLS_COLOR[iv.class]||"var(--unsched)";
+      const s=Math.max(from,Date.parse(iv.start)), e=Math.min(to,Date.parse(iv.end));
+      if(e<=s) return;
+      const x=px(s), w=Math.max(2, px(e)-px(s)); const col=CLS_COLOR[iv.class]||"var(--unsched)";
       bars+=`<rect x="${x}" y="8" width="${w}" height="16" rx="2" fill="${col}" class="seg"
-        data-t="${esc(d.device+' · '+iv.class+' · '+iv.start.slice(11,16)+'→'+iv.end.slice(11,16)+' ('+fmtDur(iv.duration_s)+') '+iv.statuses.join(','))}"/>`;
+        data-t="${esc(d.device+' · '+iv.class+' · '+iv.start.slice(0,16).replace('T',' ')+'→'+(iv.ongoing?'ongoing':iv.end.slice(11,16))+' ('+fmtDur(iv.duration_s)+')')}"/>`;
     });
-    return `<div class="track"><div class="lbl">${esc(d.device)}</div>
+    return `<div class="track">
       <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
         <text x="0" y="20">${esc(d.device)}</text>${bars}
-        <text x="${m.l}" y="${H-2}">${(REPORT.window.from||"").slice(11,16)}</text>
-        <text x="${W-m.r}" y="${H-2}" text-anchor="end">${(REPORT.window.to||"").slice(11,16)}</text>
+        <text x="${m.l}" y="${H-2}">${fmtAxis(from)}</text>
+        <text x="${W-m.r}" y="${H-2}" text-anchor="end">${fmtAxis(to)}</text>
       </svg></div>`;
   }).join("");
   wireTips();
 }
 
-function renderUnscheduled(){
+function renderOutages(){
+  const {from,to}=rangeWindow();
   const all=[];
-  REPORT.devices.forEach(d=> (d.unscheduled||[]).forEach(iv=>all.push(iv)));
+  REPORT.devices.forEach(d=> (d.intervals||[]).forEach(iv=>{
+    if(iv.class!=="unscheduled") return;
+    if(Date.parse(iv.end)<=from || Date.parse(iv.start)>=to) return;   // outside range
+    all.push(iv);
+  }));
   all.sort((a,b)=> Date.parse(b.start)-Date.parse(a.start));
-  document.getElementById("unschedCount").textContent = `(${all.length})`;
+  document.getElementById("unschedCount").textContent = `(${all.length} · ${RANGE_LABELS[RANGE].toLowerCase()})`;
   const box=document.getElementById("unsched");
-  if(!all.length){ box.innerHTML=`<div class="empty">No unscheduled outages detected. 🎉</div>`; return; }
+  if(!all.length){ box.innerHTML=`<div class="empty">No unscheduled outages in this range. 🎉</div>`; return; }
   box.innerHTML = `<table><tr><th>Device</th><th>Start (UTC)</th><th>End (UTC)</th><th>Duration</th><th>Status</th><th></th></tr>`+
     all.map(iv=>`<tr>
       <td>${esc(iv.device)}</td>
