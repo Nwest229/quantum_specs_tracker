@@ -30,6 +30,15 @@
   .rangebtn{background:var(--chip);color:var(--muted);border:1px solid var(--line);padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12.5px;}
   .rangebtn:hover{border-color:var(--accent);}
   .rangebtn.active{border-color:var(--accent);color:var(--accent);}
+  .rangebtn .dot{width:8px;height:8px;}
+  .pickrow{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .picklbl{color:var(--muted);font-size:12px;min-width:66px;font-weight:600;}
+  .btnrow{display:flex;gap:6px;flex-wrap:wrap;}
+  #machinehead{margin:18px 0 8px;}
+  #machinehead .mname{font-size:16px;font-weight:650;}
+  #machinehead .mmeta{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .schedwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;overflow-x:auto;}
+  .schedhdr text{fill:var(--muted);}
   .track{margin-bottom:6px;}
   .track .lbl{font-size:12.5px;color:var(--fg);margin-bottom:2px;}
   table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;margin-top:6px;}
@@ -63,27 +72,29 @@
 
 <div class="wrap">
   <div id="banner"></div>
-  <div id="cards"></div>
 
-  <h2>Uptime timeline</h2>
-  <div class="rangebar" id="rangebar"></div>
+  <div class="pickrow"><span class="picklbl">Range</span><div class="btnrow" id="rangebar"></div></div>
+  <div class="pickrow"><span class="picklbl">Company</span><div class="btnrow" id="companybar"></div></div>
+  <div class="pickrow"><span class="picklbl">Machine</span><div class="btnrow" id="machinebar"></div></div>
+
+  <div id="machinehead"></div>
   <div class="legend">
     <span><i style="background:var(--up)"></i>online</span>
-    <span><i style="background:#b5545e"></i>outage (no schedule)</span>
-    <span><i style="background:var(--unsched)"></i>unscheduled outage</span>
+    <span><i style="background:#b5545e"></i>outage</span>
+    <span><i style="background:var(--unsched)"></i>unscheduled</span>
     <span><i style="background:var(--sched)"></i>scheduled maintenance</span>
-    <span><i style="background:var(--off)"></i>off-hours (expected)</span>
+    <span><i style="background:var(--off)"></i>no data</span>
   </div>
-  <div id="timeline"></div>
+  <div id="schedule"></div>
 
-  <h2>Unscheduled outages <span class="muted" id="unschedCount"></span></h2>
+  <h2>Outages <span class="muted" id="unschedCount"></span></h2>
   <div id="unsched"></div>
 </div>
 
 <div class="tip" id="tip"></div>
 
 <script>
-let REPORT=null, RANGE="all";
+let REPORT=null, RANGE="week", COMPANY=null, MACHINE=null;
 const RANGES={day:864e5, week:6048e5, month:2592e6, year:31536e6, all:null};
 const RANGE_LABELS={day:"Past day", week:"Past week", month:"Past month", year:"Past year", all:"All data"};
 const CLS_COLOR={unscheduled:"var(--unsched)", scheduled:"var(--sched)", "off-hours":"var(--off)", outage:"#b5545e"};
@@ -98,10 +109,13 @@ function render(){
   if(!REPORT){ return; }
   document.getElementById("subtitle").textContent =
     `generated ${(REPORT.generated||"").slice(0,16)} · ${REPORT.devices.length} devices · data from ${(REPORT.window.from||"—").slice(0,10)}`;
-  renderRangeBar();
-  renderView();
+  // pick sensible defaults: first company, first machine in it
+  const g=byCompany(REPORT.devices); const comps=companiesSorted(g);
+  if(!COMPANY || !g[COMPANY]) COMPANY=comps[0]||null;
+  const machines=(COMPANY&&g[COMPANY])||[];
+  if(!MACHINE || !machines.some(d=>d.device===MACHINE)) MACHINE=machines[0]?machines[0].device:null;
+  renderRangeBar(); renderCompanyBar(); renderMachineBar(); renderSchedule(); renderOutages();
 }
-function renderView(){ renderCards(); renderTimeline(); renderOutages(); }
 
 function renderRangeBar(){
   const bar=document.getElementById("rangebar");
@@ -132,82 +146,110 @@ function devLabel(id){ const d=parseDev(id); const n=d.name? d.name.charAt(0).to
 function byCompany(devices){ const g={}; devices.forEach(d=>{ const c=parseDev(d.device).company; (g[c]=g[c]||[]).push(d); }); return g; }
 function companiesSorted(g){ return Object.keys(g).sort((a,b)=>companyLabel(a).localeCompare(companyLabel(b))); }
 
-function renderCards(){
-  const {covFrom,covTo}=rangeWindow(); const effSpan=(covTo-covFrom)/1000;
+function renderCompanyBar(){
   const g=byCompany(REPORT.devices);
-  const card=d=>{
-    const c=statusColor(d.current_status);
-    const up = effSpan>0 ? Math.round((1-downSeconds(d,covFrom,covTo)/effSpan)*10000)/100 : null;
-    return `<div class="card">
-      <div class="dev">${esc(devLabel(d.device))}</div>
-      <div class="st"><span class="dot" style="background:${c}"></span>${esc(d.current_status)}</div>
-      <div class="big">${up==null?"—":up+"%"}</div>
-      <div class="muted" style="font-size:12px">uptime · ${RANGE_LABELS[RANGE].toLowerCase()}</div>
-      <div class="muted" style="font-size:12px">last seen ${esc((d.last_seen||"").slice(0,16))}</div>
-    </div>`;
-  };
-  const html=companiesSorted(g).map(c=>
-    `<h3 class="company">${esc(companyLabel(c))} <span class="muted" style="font-weight:400;font-size:12px">· ${g[c].length}</span></h3>`+
-    `<div class="cards">`+g[c].map(card).join("")+`</div>`).join("");
-  document.getElementById("cards").innerHTML = html || `<div class="empty">No devices in the report yet.</div>`;
+  const bar=document.getElementById("companybar");
+  bar.innerHTML=companiesSorted(g).map(c=>
+    `<button class="rangebtn${c===COMPANY?' active':''}" data-c="${c}">${esc(companyLabel(c))} <span class="muted">${g[c].length}</span></button>`).join("");
+  bar.querySelectorAll(".rangebtn").forEach(b=> b.onclick=()=>{ COMPANY=b.dataset.c; MACHINE=null; render(); });
 }
 
-function fmtAxis(ms){ const iso=new Date(ms).toISOString();
-  return (RANGE==="day") ? iso.slice(5,16).replace("T"," ") : iso.slice(0,10); }
+function renderMachineBar(){
+  const g=byCompany(REPORT.devices); const machines=(COMPANY&&g[COMPANY])||[];
+  const bar=document.getElementById("machinebar");
+  bar.innerHTML=machines.map(d=>
+    `<button class="rangebtn${d.device===MACHINE?' active':''}" data-m="${esc(d.device)}">
+       <span class="dot" style="background:${statusColor(d.current_status)}"></span> ${esc(devLabel(d.device))}</button>`).join("")
+    || `<span class="muted" style="font-size:12px">no machines</span>`;
+  bar.querySelectorAll(".rangebtn").forEach(b=> b.onclick=()=>{ MACHINE=b.dataset.m; renderMachineBar(); renderSchedule(); renderOutages(); });
+}
 
-function renderTimeline(){
-  const el=document.getElementById("timeline");
-  const wf=Date.parse(REPORT.window.from), wt=Date.parse(REPORT.window.to);
-  if(!(wt>wf)){ el.innerHTML=`<div class="empty">Not enough data for a timeline yet — the poller needs a few samples.</div>`; return; }
-  const {from,to,covFrom,covTo}=rangeWindow(); const span=(to-from)||1;
-  const W=Math.min(1000,(document.body.clientWidth||1000)-60), H=34, m={l:150,r:14};
-  const iw=W-m.l-m.r;
-  const px=ms=> m.l + Math.max(0,Math.min(1,(ms-from)/span))*iw;
-  const track=d=>{
-    // grey = no data over the range; green = observed & online; coloured = down intervals
-    let bars=`<rect x="${m.l}" y="8" width="${iw}" height="16" rx="3" fill="var(--off)" opacity="0.16"/>`;
-    const gx=px(covFrom), gw=px(covTo)-px(covFrom);
-    if(gw>0) bars+=`<rect x="${gx}" y="8" width="${gw}" height="16" rx="3" fill="var(--up)" opacity="0.30"/>`;
-    (d.intervals||[]).forEach(iv=>{
-      const s=Math.max(from,Date.parse(iv.start)), e=Math.min(to,Date.parse(iv.end));
-      if(e<=s) return;
-      const x=px(s), w=Math.max(2, px(e)-px(s)); const col=CLS_COLOR[iv.class]||"var(--unsched)";
-      bars+=`<rect x="${x}" y="8" width="${w}" height="16" rx="2" fill="${col}" class="seg"
-        data-t="${esc(d.device+' · '+iv.class+' · '+iv.start.slice(0,16).replace('T',' ')+'→'+(iv.ongoing?'ongoing':iv.end.slice(11,16))+' ('+fmtDur(iv.duration_s)+')')}"/>`;
-    });
-    return `<div class="track">
-      <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
-        <text x="0" y="20">${esc(devLabel(d.device))}</text>${bars}
-        <text x="${m.l}" y="${H-2}">${fmtAxis(from)}</text>
-        <text x="${W-m.r}" y="${H-2}" text-anchor="end">${fmtAxis(to)}</text>
-      </svg></div>`;
-  };
-  const g=byCompany(REPORT.devices);
-  el.innerHTML = companiesSorted(g).map(c=>
-    `<h3 class="company">${esc(companyLabel(c))}</h3>`+g[c].map(track).join("")).join("");
+const WEEKDAY=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function renderSchedule(){
+  const head=document.getElementById("machinehead"), el=document.getElementById("schedule");
+  const d=MACHINE && REPORT.devices.find(x=>x.device===MACHINE);
+  if(!d){ head.innerHTML=""; el.innerHTML=`<div class="empty">Pick a company, then a machine.</div>`; return; }
+  const {from,to,covFrom,covTo}=rangeWindow(); const effSpan=(covTo-covFrom)/1000;
+  const up = effSpan>0 ? Math.round((1-downSeconds(d,covFrom,covTo)/effSpan)*10000)/100 : null;
+  head.innerHTML=`<div class="mname">${esc(devLabel(d.device))}
+      <span class="dot" style="background:${statusColor(d.current_status)}"></span>
+      <span style="font-size:13px;font-weight:500">${esc(d.current_status)}</span></div>
+    <div class="mmeta">uptime ${up==null?"—":"<b>"+up+"%</b>"} · ${RANGE_LABELS[RANGE].toLowerCase()} · last seen ${esc((d.last_seen||"").slice(0,16))} UTC</div>`;
+  // days spanning the range
+  const D=864e5, start=Math.floor(from/D)*D, days=[];
+  for(let t=start;t<=to;t+=D) days.push(t);
+  el.innerHTML = (days.length<=45) ? agendaHTML(d,days,covFrom,covTo) : heatmapHTML(d,days,covFrom,covTo);
   wireTips();
+}
+
+// agenda: one row per day, a 24-hour strip (real daily-schedule look)
+function agendaHTML(d,days,covFrom,covTo){
+  const D=864e5, W=880, m={l:150,r:14}, iw=W-m.l-m.r;
+  const hx=frac=> m.l+frac*iw;
+  let hdr=`<svg viewBox="0 0 ${W} 15" width="100%" height="15" class="schedhdr">`;
+  for(let h=0;h<=24;h+=6){ hdr+=`<text x="${hx(h/24)}" y="11" text-anchor="${h===0?'start':h===24?'end':'middle'}">${String(h).padStart(2,'0')}:00</text>`; }
+  hdr+=`</svg>`;
+  const rows=days.map(df=>{
+    const dt=df+D, dd=new Date(df);
+    const lbl=`${WEEKDAY[dd.getUTCDay()]} ${dd.toISOString().slice(0,10)}`;
+    const px=ms=> m.l + Math.max(0,Math.min(1,(ms-df)/D))*iw;
+    let bars=`<rect x="${m.l}" y="5" width="${iw}" height="15" rx="2" fill="var(--off)" opacity="0.16"/>`;
+    const oa=Math.max(df,covFrom), ob=Math.min(dt,covTo);
+    if(ob>oa) bars+=`<rect x="${px(oa)}" y="5" width="${px(ob)-px(oa)}" height="15" rx="2" fill="var(--up)" opacity="0.30"/>`;
+    for(let h=6;h<24;h+=6){ const x=px(df+h*36e5); bars+=`<line x1="${x}" y1="5" x2="${x}" y2="20" stroke="var(--line)" opacity="0.6"/>`; }
+    (d.intervals||[]).forEach(iv=>{ const s=Math.max(df,Date.parse(iv.start)), e=Math.min(dt,Date.parse(iv.end)); if(e<=s) return;
+      const col=CLS_COLOR[iv.class]||"var(--unsched)";
+      bars+=`<rect x="${px(s)}" y="5" width="${Math.max(2,px(e)-px(s))}" height="15" rx="2" fill="${col}" class="seg"
+        data-t="${esc(lbl+' · '+iv.class+' · '+iv.start.slice(11,16)+'→'+(iv.ongoing?'ongoing':iv.end.slice(11,16))+' ('+fmtDur(iv.duration_s)+')')}"/>`;
+    });
+    return `<svg viewBox="0 0 ${W} 25" width="100%" height="25"><text x="0" y="16">${lbl}</text>${bars}</svg>`;
+  }).join("");
+  return `<div class="schedwrap">${hdr}${rows}</div>`;
+}
+
+// heatmap: one cell per day, calendar grid (weekday rows × week columns), for long ranges
+function heatmapHTML(d,days,covFrom,covTo){
+  const D=864e5, cell=14, gap=3, top=20, left=34;
+  const wd=ms=> (new Date(ms).getUTCDay()+6)%7;   // Mon=0..Sun=6
+  const firstMon=days[0]-wd(days[0])*D;
+  const cols=Math.floor((days[days.length-1]-firstMon)/(7*D))+1;
+  const W=left+cols*(cell+gap)+8, H=top+7*(cell+gap)+4;
+  function color(df){ const dt=df+D, oa=Math.max(df,covFrom), ob=Math.min(dt,covTo), obs=(ob-oa)/1000;
+    if(obs<=0) return {c:"var(--off)",o:0.16,p:null};
+    const p=1-downSeconds(d,oa,ob)/obs;
+    if(p>=0.999) return {c:"var(--up)",o:0.9,p}; if(p>=0.98) return {c:"var(--up)",o:0.5,p};
+    if(p>=0.9) return {c:"var(--sched)",o:0.75,p}; return {c:"var(--unsched)",o:0.8,p}; }
+  let g="";
+  days.forEach(df=>{ const col=Math.floor((df-firstMon)/(7*D)), row=wd(df);
+    const x=left+col*(cell+gap), y=top+row*(cell+gap), {c,o,p}=color(df);
+    g+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="2" fill="${c}" opacity="${o}" class="seg"
+      data-t="${esc(new Date(df).toISOString().slice(0,10)+' · '+(p==null?'no data':(Math.round(p*1000)/10)+'% up'))}"/>`; });
+  ["Mon","","Wed","","Fri","",""].forEach((l,i)=>{ if(l) g+=`<text x="4" y="${top+i*(cell+gap)+cell-2}" font-size="9">${l}</text>`; });
+  let lm=-1; days.forEach(df=>{ const mo=new Date(df).getUTCMonth(); if(mo!==lm){ lm=mo; const col=Math.floor((df-firstMon)/(7*D)); g+=`<text x="${left+col*(cell+gap)}" y="13" font-size="9">${MONTHS[mo]}</text>`; } });
+  return `<div class="schedwrap"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}</svg></div>`;
 }
 
 function renderOutages(){
   const {from,to}=rangeWindow();
+  const d=MACHINE && REPORT.devices.find(x=>x.device===MACHINE);
   const all=[];
-  REPORT.devices.forEach(d=> (d.intervals||[]).forEach(iv=>{
-    if(iv.class!=="unscheduled") return;
+  if(d) (d.intervals||[]).forEach(iv=>{
     if(Date.parse(iv.end)<=from || Date.parse(iv.start)>=to) return;   // outside range
     all.push(iv);
-  }));
+  });
   all.sort((a,b)=> Date.parse(b.start)-Date.parse(a.start));
   document.getElementById("unschedCount").textContent = `(${all.length} · ${RANGE_LABELS[RANGE].toLowerCase()})`;
   const box=document.getElementById("unsched");
-  if(!all.length){ box.innerHTML=`<div class="empty">No unscheduled outages in this range. 🎉</div>`; return; }
-  box.innerHTML = `<table><tr><th>Device</th><th>Start (UTC)</th><th>End (UTC)</th><th>Duration</th><th>Status</th><th></th></tr>`+
+  if(!all.length){ box.innerHTML=`<div class="empty">No outages for this machine in this range. 🎉</div>`; return; }
+  box.innerHTML = `<table><tr><th>Start (UTC)</th><th>End (UTC)</th><th>Duration</th><th>Status</th><th>Type</th></tr>`+
     all.map(iv=>`<tr>
-      <td>${esc(iv.device)}</td>
       <td>${esc(iv.start.replace('T',' ').slice(0,16))}</td>
       <td>${esc(iv.ongoing?'— (ongoing)':iv.end.replace('T',' ').slice(0,16))}</td>
       <td>${fmtDur(iv.duration_s)}</td>
       <td>${esc(iv.statuses.join(', '))}</td>
-      <td>${iv.ongoing?'<span class="tag ongoing">ongoing</span>':'<span class="tag unsched">unscheduled</span>'}</td>
+      <td><span class="tag ${iv.ongoing?'ongoing':'unsched'}">${iv.ongoing?'ongoing':esc(iv.class)}</span></td>
     </tr>`).join("")+`</table>`;
 }
 
