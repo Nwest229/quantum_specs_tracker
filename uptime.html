@@ -16,45 +16,55 @@
   button,label.file{background:var(--chip);color:var(--fg);border:1px solid var(--line);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:13px;}
   button:hover,label.file:hover{border-color:var(--accent);}
   input[type=file]{display:none;}
-  .wrap{padding:18px 22px 60px;}
-  .cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:200px;}
-  .card .dev{font-weight:650;font-size:14px;margin-bottom:6px;}
+  a.navlink{background:var(--chip);color:var(--fg);border:1px solid var(--line);padding:7px 12px;border-radius:8px;font-size:13px;text-decoration:none;}
+  a.navlink:hover{border-color:var(--accent);color:var(--accent);}
+  .wrap{padding:18px 22px 60px;max-width:1160px;}
+  h2{font-size:14px;color:var(--muted);font-weight:600;margin:22px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+  .muted{color:var(--muted);}
   .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;}
-  .st{font-size:13px;} .muted{color:var(--muted);}
-  .big{font-size:22px;font-weight:650;margin:6px 0 2px;}
-  h2{font-size:14px;color:var(--muted);font-weight:600;margin:24px 0 10px;text-transform:uppercase;letter-spacing:.04em;}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px;}
-  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:middle;}
-  .rangebar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-  .rangebtn{background:var(--chip);color:var(--muted);border:1px solid var(--line);padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12.5px;}
+
+  /* step grids (companies / machines) */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;}
+  .bigcard{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 17px;cursor:pointer;font:inherit;color:var(--fg);}
+  .bigcard:hover{border-color:var(--accent);}
+  .bc-title{font-size:16px;font-weight:650;margin-bottom:5px;}
+  .bc-sub{color:var(--muted);font-size:12.5px;margin-top:2px;}
+
+  /* breadcrumb */
+  .crumb{font-size:13px;margin-bottom:14px;color:var(--fg);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .crumblink{color:var(--accent);cursor:pointer;text-decoration:none;}
+  .crumblink:hover{text-decoration:underline;}
+
+  /* range pills */
+  .pickrow{display:flex;align-items:center;gap:10px;margin:6px 0 12px;flex-wrap:wrap;}
+  .picklbl{color:var(--muted);font-size:12px;min-width:52px;font-weight:600;}
+  .btnrow{display:flex;gap:6px;flex-wrap:wrap;}
+  .rangebtn{background:var(--chip);color:var(--muted);border:1px solid var(--line);padding:5px 15px;border-radius:20px;cursor:pointer;font-size:12.5px;}
   .rangebtn:hover{border-color:var(--accent);}
   .rangebtn.active{border-color:var(--accent);color:var(--accent);}
-  .rangebtn .dot{width:8px;height:8px;}
-  .pickrow{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
-  .picklbl{color:var(--muted);font-size:12px;min-width:66px;font-weight:600;}
-  .btnrow{display:flex;gap:6px;flex-wrap:wrap;}
-  #machinehead{margin:18px 0 8px;}
-  #machinehead .mname{font-size:16px;font-weight:650;}
+
+  /* machine header + schedule */
+  #machinehead{margin:4px 0 10px;}
+  #machinehead .mname{font-size:17px;font-weight:650;}
   #machinehead .mmeta{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px;}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:middle;}
   .schedwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;overflow-x:auto;}
+  .schedwrap svg{display:block;}
   .schedhdr text{fill:var(--muted);}
-  .track{margin-bottom:6px;}
-  .track .lbl{font-size:12.5px;color:var(--fg);margin-bottom:2px;}
+  svg text{fill:var(--muted);font-size:10.5px;}
+
   table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;margin-top:6px;}
   th,td{text-align:left;padding:7px 11px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px;}
   th{color:var(--muted);font-weight:600;}
-  .tag{font-size:11px;padding:1px 7px;border-radius:20px;border:1px solid;}
-  .tag.unsched{color:var(--unsched);border-color:var(--unsched);}
+  .tag{font-size:11px;padding:1px 8px;border-radius:20px;border:1px solid;}
+  .tag.unscheduled{color:var(--unsched);border-color:var(--unsched);}
+  .tag.outage{color:#b5545e;border-color:#b5545e;}
+  .tag.scheduled{color:var(--sched);border-color:var(--sched);}
   .tag.ongoing{color:var(--sched);border-color:var(--sched);}
   .empty{color:var(--muted);padding:14px 0;}
-  .tip{position:fixed;pointer-events:none;background:#000d;border:1px solid var(--line);padding:6px 9px;border-radius:7px;font-size:12px;z-index:99;display:none;max-width:260px;}
-  .banner{background:#1c2130;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--muted);font-size:12.5px;}
-  svg text{fill:var(--muted);font-size:10.5px;}
-  a.navlink{background:var(--chip);color:var(--fg);border:1px solid var(--line);padding:7px 12px;border-radius:8px;font-size:13px;text-decoration:none;}
-  a.navlink:hover{border-color:var(--accent);color:var(--accent);}
-  .company{font-size:13px;color:var(--accent);font-weight:650;margin:20px 0 4px;letter-spacing:.02em;}
-  .company:first-of-type{margin-top:6px;}
+  .tip{position:fixed;pointer-events:none;background:#000d;border:1px solid var(--line);padding:6px 9px;border-radius:7px;font-size:12px;z-index:99;display:none;max-width:280px;}
+  .banner{background:#1c2130;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--muted);font-size:12.5px;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -72,184 +82,164 @@
 
 <div class="wrap">
   <div id="banner"></div>
-
-  <div class="pickrow"><span class="picklbl">Range</span><div class="btnrow" id="rangebar"></div></div>
-  <div class="pickrow"><span class="picklbl">Company</span><div class="btnrow" id="companybar"></div></div>
-  <div class="pickrow"><span class="picklbl">Machine</span><div class="btnrow" id="machinebar"></div></div>
-
-  <div id="machinehead"></div>
-  <div class="legend">
-    <span><i style="background:var(--up)"></i>online</span>
-    <span><i style="background:#b5545e"></i>outage</span>
-    <span><i style="background:var(--unsched)"></i>unscheduled</span>
-    <span><i style="background:var(--sched)"></i>scheduled maintenance</span>
-    <span><i style="background:var(--off)"></i>no data</span>
-  </div>
-  <div id="schedule"></div>
-
-  <h2>Outages <span class="muted" id="unschedCount"></span></h2>
-  <div id="unsched"></div>
+  <div id="view"></div>
 </div>
 
 <div class="tip" id="tip"></div>
 
 <script>
-let REPORT=null, RANGE="week", COMPANY=null, MACHINE=null;
-const RANGES={day:864e5, week:6048e5, month:2592e6, year:31536e6, all:null};
-const RANGE_LABELS={day:"Past day", week:"Past week", month:"Past month", year:"Past year", all:"All data"};
+let REPORT=null, COMPANY=null, MACHINE=null, RANGE="week";
+const RANGES={day:864e5, week:6048e5, month:2592e6};
+const RANGE_LABELS={day:"Day", week:"Week", month:"Month"};
 const CLS_COLOR={unscheduled:"var(--unsched)", scheduled:"var(--sched)", "off-hours":"var(--off)", outage:"#b5545e"};
+const WEEKDAY=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const COMPANY_NAMES={iqm:"IQM",ibm:"IBM",ionq:"IonQ",rigetti:"Rigetti",quera:"QuEra",aqt:"AQT",
+  pasqal:"Pasqal",quantinuum:"Quantinuum",oxford:"Oxford Ionics",aws:"AWS",qbraid:"qBraid",
+  azure:"Azure",openquantum:"OpenQuantum",other:"Other"};
 
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
 function statusColor(s){ return (s==="ONLINE") ? "var(--up)" : (/(POLL_ERROR|UNKNOWN|NOT_FOUND)/.test(s) ? "var(--off)" : "var(--unsched)"); }
 function fmtDur(sec){ if(sec==null) return "—";
   const d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
   return d? `${d}d ${h}h` : (h? `${h}h ${m}m` : (m? `${m}m` : `${sec}s`)); }
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
 
-function render(){
-  if(!REPORT){ return; }
-  document.getElementById("subtitle").textContent =
-    `generated ${(REPORT.generated||"").slice(0,16)} · ${REPORT.devices.length} devices · data from ${(REPORT.window.from||"—").slice(0,10)}`;
-  // pick sensible defaults: first company, first machine in it
-  const g=byCompany(REPORT.devices); const comps=companiesSorted(g);
-  if(!COMPANY || !g[COMPANY]) COMPANY=comps[0]||null;
-  const machines=(COMPANY&&g[COMPANY])||[];
-  if(!MACHINE || !machines.some(d=>d.device===MACHINE)) MACHINE=machines[0]?machines[0].device:null;
-  renderRangeBar(); renderCompanyBar(); renderMachineBar(); renderSchedule(); renderOutages();
-}
+function parseDev(id){ const p=String(id).split(":");
+  return p.length>=4 ? {provider:p[0],company:p[1],name:p.slice(3).join(":")} : {provider:"",company:"other",name:String(id)}; }
+function companyLabel(c){ return COMPANY_NAMES[c] || (c?c.toUpperCase():"Other"); }
+function mName(id){ const d=parseDev(id); return d.name ? d.name.charAt(0).toUpperCase()+d.name.slice(1) : id; }
+function mRoute(id){ const d=parseDev(id); return d.provider ? "via "+d.provider : ""; }
+function byCompany(devices){ const g={}; devices.forEach(d=>{ (g[parseDev(d.device).company]=g[parseDev(d.device).company]||[]).push(d); }); return g; }
+function companiesSorted(g){ return Object.keys(g).sort((a,b)=>companyLabel(a).localeCompare(companyLabel(b))); }
 
-function renderRangeBar(){
-  const bar=document.getElementById("rangebar");
-  bar.innerHTML=Object.keys(RANGES).map(k=>
-    `<button class="rangebtn${k===RANGE?' active':''}" data-r="${k}">${RANGE_LABELS[k]}</button>`).join("");
-  bar.querySelectorAll(".rangebtn").forEach(b=> b.onclick=()=>{ RANGE=b.dataset.r; renderRangeBar(); renderView(); });
-}
-
-// selected range [from,to] plus the observed-data overlap [covFrom,covTo], in ms
 function rangeWindow(){
   const to=Date.parse(REPORT.window.to), wf=Date.parse(REPORT.window.from);
-  const from=(RANGE==="all"||!RANGES[RANGE]) ? wf : to-RANGES[RANGE];
+  const from=to-(RANGES[RANGE]||RANGES.week);
   return {from, to, covFrom:Math.max(from,wf), covTo:to};
 }
 function downSeconds(d,a,b){ let s=0;
   (d.intervals||[]).forEach(iv=>{ const x=Math.max(a,Date.parse(iv.start)), y=Math.min(b,Date.parse(iv.end)); if(y>x) s+=(y-x)/1000; });
   return s; }
 
-// qBraid ids look like "provider:company:type:name" (e.g. "aws:iqm:qpu:garnet")
-const COMPANY_NAMES={iqm:"IQM",ibm:"IBM",ionq:"IonQ",rigetti:"Rigetti",quera:"QuEra",aqt:"AQT",
-  pasqal:"Pasqal",quantinuum:"Quantinuum",oxford:"Oxford Ionics",aws:"AWS",qbraid:"qBraid",
-  azure:"Azure",openquantum:"OpenQuantum",other:"Other"};
-function parseDev(id){ const p=String(id).split(":");
-  return p.length>=4 ? {provider:p[0],company:p[1],name:p.slice(3).join(":")} : {provider:"",company:"other",name:String(id)}; }
-function companyLabel(c){ return COMPANY_NAMES[c] || (c?c.toUpperCase():"Other"); }
-function devLabel(id){ const d=parseDev(id); const n=d.name? d.name.charAt(0).toUpperCase()+d.name.slice(1) : id;
-  return d.provider ? `${n} · ${d.provider}` : n; }
-function byCompany(devices){ const g={}; devices.forEach(d=>{ const c=parseDev(d.device).company; (g[c]=g[c]||[]).push(d); }); return g; }
-function companiesSorted(g){ return Object.keys(g).sort((a,b)=>companyLabel(a).localeCompare(companyLabel(b))); }
-
-function renderCompanyBar(){
+/* ---------- step router ---------- */
+function render(){
+  if(!REPORT) return;
+  document.getElementById("subtitle").textContent =
+    `${REPORT.devices.length} devices · data from ${(REPORT.window.from||"—").slice(0,10)} · generated ${(REPORT.generated||"").slice(0,16)} UTC`;
   const g=byCompany(REPORT.devices);
-  const bar=document.getElementById("companybar");
-  bar.innerHTML=companiesSorted(g).map(c=>
-    `<button class="rangebtn${c===COMPANY?' active':''}" data-c="${c}">${esc(companyLabel(c))} <span class="muted">${g[c].length}</span></button>`).join("");
-  bar.querySelectorAll(".rangebtn").forEach(b=> b.onclick=()=>{ COMPANY=b.dataset.c; MACHINE=null; render(); });
+  if(!COMPANY || !g[COMPANY]) return renderCompanies(g);
+  if(!MACHINE || !g[COMPANY].some(d=>d.device===MACHINE)) return renderMachines(g);
+  renderScheduleView(g);
 }
 
-function renderMachineBar(){
-  const g=byCompany(REPORT.devices); const machines=(COMPANY&&g[COMPANY])||[];
-  const bar=document.getElementById("machinebar");
-  bar.innerHTML=machines.map(d=>
-    `<button class="rangebtn${d.device===MACHINE?' active':''}" data-m="${esc(d.device)}">
-       <span class="dot" style="background:${statusColor(d.current_status)}"></span> ${esc(devLabel(d.device))}</button>`).join("")
-    || `<span class="muted" style="font-size:12px">no machines</span>`;
-  bar.querySelectorAll(".rangebtn").forEach(b=> b.onclick=()=>{ MACHINE=b.dataset.m; renderMachineBar(); renderSchedule(); renderOutages(); });
+/* step 1 — companies */
+function renderCompanies(g){
+  const cards=companiesSorted(g).map(c=>{
+    const ms=g[c], online=ms.filter(d=>d.current_status==="ONLINE").length;
+    return `<button class="bigcard" data-c="${c}">
+      <div class="bc-title">${esc(companyLabel(c))}</div>
+      <div class="bc-sub">${ms.length} machine${ms.length>1?"s":""}</div>
+      <div class="bc-sub"><span class="dot" style="background:var(--up)"></span>${online} online · ${ms.length-online} not</div>
+    </button>`;
+  }).join("");
+  document.getElementById("view").innerHTML = `<h2>Companies</h2><div class="grid">${cards||'<div class="empty">No devices yet.</div>'}</div>`;
+  document.querySelectorAll(".bigcard").forEach(b=> b.onclick=()=>{ COMPANY=b.dataset.c; MACHINE=null; render(); });
 }
 
-const WEEKDAY=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+/* step 2 — machines of a company */
+function renderMachines(g){
+  const ms=g[COMPANY]||[];
+  const cards=ms.map(d=>`<button class="bigcard" data-m="${esc(d.device)}">
+      <div class="bc-title">${esc(mName(d.device))}</div>
+      <div class="bc-sub">${esc(mRoute(d.device))}</div>
+      <div class="bc-sub"><span class="dot" style="background:${statusColor(d.current_status)}"></span>${esc(d.current_status)}</div>
+    </button>`).join("");
+  document.getElementById("view").innerHTML =
+    `<div class="crumb"><a class="crumblink" id="toCompanies">Companies</a><span class="muted">›</span><b>${esc(companyLabel(COMPANY))}</b></div>
+     <h2>${esc(companyLabel(COMPANY))} · machines</h2><div class="grid">${cards}</div>`;
+  document.getElementById("toCompanies").onclick=()=>{ COMPANY=null; MACHINE=null; render(); };
+  document.querySelectorAll(".bigcard").forEach(b=> b.onclick=()=>{ MACHINE=b.dataset.m; render(); });
+}
 
-function renderSchedule(){
-  const head=document.getElementById("machinehead"), el=document.getElementById("schedule");
-  const d=MACHINE && REPORT.devices.find(x=>x.device===MACHINE);
-  if(!d){ head.innerHTML=""; el.innerHTML=`<div class="empty">Pick a company, then a machine.</div>`; return; }
-  const {from,to,covFrom,covTo}=rangeWindow(); const effSpan=(covTo-covFrom)/1000;
+/* step 3 — one machine's schedule */
+function renderScheduleView(g){
+  const d=g[COMPANY].find(x=>x.device===MACHINE);
+  const {covFrom,covTo}=rangeWindow(); const effSpan=(covTo-covFrom)/1000;
   const up = effSpan>0 ? Math.round((1-downSeconds(d,covFrom,covTo)/effSpan)*10000)/100 : null;
-  head.innerHTML=`<div class="mname">${esc(devLabel(d.device))}
-      <span class="dot" style="background:${statusColor(d.current_status)}"></span>
-      <span style="font-size:13px;font-weight:500">${esc(d.current_status)}</span></div>
-    <div class="mmeta">uptime ${up==null?"—":"<b>"+up+"%</b>"} · ${RANGE_LABELS[RANGE].toLowerCase()} · last seen ${esc((d.last_seen||"").slice(0,16))} UTC</div>`;
-  // days spanning the range
-  const D=864e5, start=Math.floor(from/D)*D, days=[];
-  for(let t=start;t<=to;t+=D) days.push(t);
-  el.innerHTML = (days.length<=45) ? agendaHTML(d,days,covFrom,covTo) : heatmapHTML(d,days,covFrom,covTo);
+  const rbtns=Object.keys(RANGES).map(k=>`<button class="rangebtn${k===RANGE?' active':''}" data-r="${k}">${RANGE_LABELS[k]}</button>`).join("");
+  document.getElementById("view").innerHTML=`
+    <div class="crumb">
+      <a class="crumblink" id="toCompanies">Companies</a><span class="muted">›</span>
+      <a class="crumblink" id="toMachines">${esc(companyLabel(COMPANY))}</a><span class="muted">›</span>
+      <b>${esc(mName(d.device))}</b>
+    </div>
+    <div id="machinehead">
+      <div class="mname">${esc(mName(d.device))} <span class="muted" style="font-size:13px;font-weight:400">${esc(mRoute(d.device))}</span>
+        <span class="dot" style="background:${statusColor(d.current_status)}"></span> <span style="font-size:13px;font-weight:500">${esc(d.current_status)}</span></div>
+      <div class="mmeta">uptime ${up==null?"—":"<b>"+up+"%</b>"} · past ${RANGE_LABELS[RANGE].toLowerCase()} · last seen ${esc((d.last_seen||"").slice(0,16))} UTC</div>
+    </div>
+    <div class="pickrow"><span class="picklbl">View</span><div class="btnrow">${rbtns}</div></div>
+    <div class="legend">
+      <span><i style="background:var(--up)"></i>online</span>
+      <span><i style="background:#b5545e"></i>outage</span>
+      <span><i style="background:var(--unsched)"></i>unscheduled</span>
+      <span><i style="background:var(--sched)"></i>scheduled maintenance</span>
+      <span><i style="background:var(--off)"></i>no data</span>
+    </div>
+    <div id="schedule"></div>
+    <h2>Outages <span class="muted" id="outCount"></span></h2>
+    <div id="outages"></div>`;
+  document.getElementById("toCompanies").onclick=()=>{ COMPANY=null; MACHINE=null; render(); };
+  document.getElementById("toMachines").onclick=()=>{ MACHINE=null; render(); };
+  document.querySelectorAll(".pickrow .rangebtn").forEach(b=> b.onclick=()=>{ RANGE=b.dataset.r; renderScheduleView(g); });
+  document.getElementById("schedule").innerHTML = agendaHTML(d);
+  renderOutages(d);
   wireTips();
 }
 
-// agenda: one row per day, a 24-hour strip (real daily-schedule look)
-function agendaHTML(d,days,covFrom,covTo){
-  const D=864e5, W=880, m={l:150,r:14}, iw=W-m.l-m.r;
+/* the day-by-day schedule (fixed-pixel SVG so text stays crisp, rows compact) */
+function agendaHTML(d){
+  const {from,to,covFrom,covTo}=rangeWindow();
+  const D=864e5, start=Math.floor(from/D)*D, days=[];
+  for(let t=start;t<=to;t+=D) days.push(t);
+  const W=Math.max(560,Math.min(1080,(window.innerWidth||1000)-72)), m={l:150,r:12}, iw=W-m.l-m.r;
   const hx=frac=> m.l+frac*iw;
-  let hdr=`<svg viewBox="0 0 ${W} 15" width="100%" height="15" class="schedhdr">`;
-  for(let h=0;h<=24;h+=6){ hdr+=`<text x="${hx(h/24)}" y="11" text-anchor="${h===0?'start':h===24?'end':'middle'}">${String(h).padStart(2,'0')}:00</text>`; }
+  let hdr=`<svg class="schedhdr" width="${W}" height="16" viewBox="0 0 ${W} 16">`;
+  for(let h=0;h<=24;h+=6){ hdr+=`<text x="${hx(h/24)}" y="12" text-anchor="${h===0?'start':h===24?'end':'middle'}">${String(h).padStart(2,'0')}:00</text>`; }
   hdr+=`</svg>`;
   const rows=days.map(df=>{
-    const dt=df+D, dd=new Date(df);
-    const lbl=`${WEEKDAY[dd.getUTCDay()]} ${dd.toISOString().slice(0,10)}`;
+    const dt=df+D, dd=new Date(df), lbl=`${WEEKDAY[dd.getUTCDay()]} ${dd.toISOString().slice(0,10)}`;
     const px=ms=> m.l + Math.max(0,Math.min(1,(ms-df)/D))*iw;
-    let bars=`<rect x="${m.l}" y="5" width="${iw}" height="15" rx="2" fill="var(--off)" opacity="0.16"/>`;
+    let bars=`<rect x="${m.l}" y="4" width="${iw}" height="14" rx="2" fill="var(--off)" opacity="0.16"/>`;
     const oa=Math.max(df,covFrom), ob=Math.min(dt,covTo);
-    if(ob>oa) bars+=`<rect x="${px(oa)}" y="5" width="${px(ob)-px(oa)}" height="15" rx="2" fill="var(--up)" opacity="0.30"/>`;
-    for(let h=6;h<24;h+=6){ const x=px(df+h*36e5); bars+=`<line x1="${x}" y1="5" x2="${x}" y2="20" stroke="var(--line)" opacity="0.6"/>`; }
-    (d.intervals||[]).forEach(iv=>{ const s=Math.max(df,Date.parse(iv.start)), e=Math.min(dt,Date.parse(iv.end)); if(e<=s) return;
+    if(ob>oa) bars+=`<rect x="${px(oa)}" y="4" width="${px(ob)-px(oa)}" height="14" rx="2" fill="var(--up)" opacity="0.32"/>`;
+    for(let h=6;h<24;h+=6){ const x=px(df+h*36e5); bars+=`<line x1="${x}" y1="4" x2="${x}" y2="18" stroke="var(--line)"/>`; }
+    (d.intervals||[]).forEach(iv=>{
+      // an ongoing outage is still down "now" — extend it to the latest observation
+      const ivEnd = iv.ongoing ? Math.max(Date.parse(iv.end), covTo) : Date.parse(iv.end);
+      const s=Math.max(df,Date.parse(iv.start)), e=Math.min(dt,ivEnd); if(e<=s) return;
       const col=CLS_COLOR[iv.class]||"var(--unsched)";
-      bars+=`<rect x="${px(s)}" y="5" width="${Math.max(2,px(e)-px(s))}" height="15" rx="2" fill="${col}" class="seg"
-        data-t="${esc(lbl+' · '+iv.class+' · '+iv.start.slice(11,16)+'→'+(iv.ongoing?'ongoing':iv.end.slice(11,16))+' ('+fmtDur(iv.duration_s)+')')}"/>`;
+      bars+=`<rect x="${px(s)}" y="4" width="${Math.max(iv.ongoing?4:2,px(e)-px(s))}" height="14" rx="2" fill="${col}" class="seg"
+        data-t="${esc(lbl+' · '+iv.class+(iv.ongoing?' · ongoing (down now)':'')+' · '+iv.start.slice(11,16)+'→'+(iv.ongoing?'now':iv.end.slice(11,16))+' ('+fmtDur(iv.duration_s)+')')}"/>`;
     });
-    return `<svg viewBox="0 0 ${W} 25" width="100%" height="25"><text x="0" y="16">${lbl}</text>${bars}</svg>`;
+    return `<svg width="${W}" height="22" viewBox="0 0 ${W} 22"><text x="0" y="14">${lbl}</text>${bars}</svg>`;
   }).join("");
   return `<div class="schedwrap">${hdr}${rows}</div>`;
 }
 
-// heatmap: one cell per day, calendar grid (weekday rows × week columns), for long ranges
-function heatmapHTML(d,days,covFrom,covTo){
-  const D=864e5, cell=14, gap=3, top=20, left=34;
-  const wd=ms=> (new Date(ms).getUTCDay()+6)%7;   // Mon=0..Sun=6
-  const firstMon=days[0]-wd(days[0])*D;
-  const cols=Math.floor((days[days.length-1]-firstMon)/(7*D))+1;
-  const W=left+cols*(cell+gap)+8, H=top+7*(cell+gap)+4;
-  function color(df){ const dt=df+D, oa=Math.max(df,covFrom), ob=Math.min(dt,covTo), obs=(ob-oa)/1000;
-    if(obs<=0) return {c:"var(--off)",o:0.16,p:null};
-    const p=1-downSeconds(d,oa,ob)/obs;
-    if(p>=0.999) return {c:"var(--up)",o:0.9,p}; if(p>=0.98) return {c:"var(--up)",o:0.5,p};
-    if(p>=0.9) return {c:"var(--sched)",o:0.75,p}; return {c:"var(--unsched)",o:0.8,p}; }
-  let g="";
-  days.forEach(df=>{ const col=Math.floor((df-firstMon)/(7*D)), row=wd(df);
-    const x=left+col*(cell+gap), y=top+row*(cell+gap), {c,o,p}=color(df);
-    g+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="2" fill="${c}" opacity="${o}" class="seg"
-      data-t="${esc(new Date(df).toISOString().slice(0,10)+' · '+(p==null?'no data':(Math.round(p*1000)/10)+'% up'))}"/>`; });
-  ["Mon","","Wed","","Fri","",""].forEach((l,i)=>{ if(l) g+=`<text x="4" y="${top+i*(cell+gap)+cell-2}" font-size="9">${l}</text>`; });
-  let lm=-1; days.forEach(df=>{ const mo=new Date(df).getUTCMonth(); if(mo!==lm){ lm=mo; const col=Math.floor((df-firstMon)/(7*D)); g+=`<text x="${left+col*(cell+gap)}" y="13" font-size="9">${MONTHS[mo]}</text>`; } });
-  return `<div class="schedwrap"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}</svg></div>`;
-}
-
-function renderOutages(){
+function renderOutages(d){
   const {from,to}=rangeWindow();
-  const d=MACHINE && REPORT.devices.find(x=>x.device===MACHINE);
-  const all=[];
-  if(d) (d.intervals||[]).forEach(iv=>{
-    if(Date.parse(iv.end)<=from || Date.parse(iv.start)>=to) return;   // outside range
-    all.push(iv);
-  });
-  all.sort((a,b)=> Date.parse(b.start)-Date.parse(a.start));
-  document.getElementById("unschedCount").textContent = `(${all.length} · ${RANGE_LABELS[RANGE].toLowerCase()})`;
-  const box=document.getElementById("unsched");
+  const all=(d.intervals||[]).filter(iv=> !(Date.parse(iv.end)<=from || Date.parse(iv.start)>=to))
+                             .sort((a,b)=>Date.parse(b.start)-Date.parse(a.start));
+  document.getElementById("outCount").textContent=`(${all.length} · past ${RANGE_LABELS[RANGE].toLowerCase()})`;
+  const box=document.getElementById("outages");
   if(!all.length){ box.innerHTML=`<div class="empty">No outages for this machine in this range. 🎉</div>`; return; }
-  box.innerHTML = `<table><tr><th>Start (UTC)</th><th>End (UTC)</th><th>Duration</th><th>Status</th><th>Type</th></tr>`+
+  box.innerHTML=`<table><tr><th>Start (UTC)</th><th>End (UTC)</th><th>Duration</th><th>Status</th><th>Type</th></tr>`+
     all.map(iv=>`<tr>
       <td>${esc(iv.start.replace('T',' ').slice(0,16))}</td>
       <td>${esc(iv.ongoing?'— (ongoing)':iv.end.replace('T',' ').slice(0,16))}</td>
       <td>${fmtDur(iv.duration_s)}</td>
-      <td>${esc(iv.statuses.join(', '))}</td>
-      <td><span class="tag ${iv.ongoing?'ongoing':'unsched'}">${iv.ongoing?'ongoing':esc(iv.class)}</span></td>
+      <td>${esc((iv.statuses||[]).join(', '))}</td>
+      <td><span class="tag ${iv.ongoing?'ongoing':esc(iv.class)}">${iv.ongoing?'ongoing':esc(iv.class)}</span></td>
     </tr>`).join("")+`</table>`;
 }
 
@@ -262,15 +252,13 @@ function wireTips(){
   });
 }
 
-function load(obj,name){
-  REPORT=obj;
-  document.getElementById("banner").innerHTML="";
-  render();
-}
+/* ---------- loading ---------- */
+function load(obj){ REPORT=obj; document.getElementById("banner").innerHTML=""; render(); }
 document.getElementById("file").addEventListener("change",e=>{
-  const f=e.target.files[0]; if(!f) return; f.text().then(t=>load(JSON.parse(t),f.name));
+  const f=e.target.files[0]; if(!f) return; f.text().then(t=>load(JSON.parse(t)));
 });
 document.getElementById("reload").addEventListener("click",()=>autoload(true));
+window.addEventListener("resize",()=>{ if(REPORT&&COMPANY&&MACHINE) render(); });
 
 function autoload(force){
   if(location.protocol==="file:" && !force){
@@ -278,8 +266,8 @@ function autoload(force){
     return;
   }
   fetch("data/uptime.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)
-    .then(j=>{ if(j) load(j,"data/uptime.json");
-      else document.getElementById("banner").innerHTML=`<div class="banner">No <code>data/uptime.json</code> yet — run <code>.venv/bin/python -m qscrape.uptime poll</code> (or set up the cron job) to start collecting.</div>`; })
+    .then(j=>{ if(j) load(j);
+      else document.getElementById("banner").innerHTML=`<div class="banner">No <code>data/uptime.json</code> yet — the poller needs to run at least once.</div>`; })
     .catch(()=>{});
 }
 autoload();
