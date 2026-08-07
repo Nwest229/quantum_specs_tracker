@@ -42,6 +42,10 @@
   .tip{position:fixed;pointer-events:none;background:#000d;border:1px solid var(--line);padding:6px 9px;border-radius:7px;font-size:12px;z-index:99;display:none;max-width:260px;}
   .banner{background:#1c2130;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--muted);font-size:12.5px;}
   svg text{fill:var(--muted);font-size:10.5px;}
+  a.navlink{background:var(--chip);color:var(--fg);border:1px solid var(--line);padding:7px 12px;border-radius:8px;font-size:13px;text-decoration:none;}
+  a.navlink:hover{border-color:var(--accent);color:var(--accent);}
+  .company{font-size:13px;color:var(--accent);font-weight:650;margin:20px 0 4px;letter-spacing:.02em;}
+  .company:first-of-type{margin-top:6px;}
 </style>
 </head>
 <body>
@@ -51,6 +55,7 @@
     <div class="sub" id="subtitle">Load <code>data/uptime.json</code> to begin</div>
   </div>
   <div class="controls">
+    <a class="navlink" href="viewer.html">← Spec tracker</a>
     <label class="file">Open JSON<input type="file" id="file" accept="application/json,.json"></label>
     <button id="reload">↻ Reload</button>
   </div>
@@ -58,7 +63,7 @@
 
 <div class="wrap">
   <div id="banner"></div>
-  <div class="cards" id="cards"></div>
+  <div id="cards"></div>
 
   <h2>Uptime timeline</h2>
   <div class="rangebar" id="rangebar"></div>
@@ -115,19 +120,36 @@ function downSeconds(d,a,b){ let s=0;
   (d.intervals||[]).forEach(iv=>{ const x=Math.max(a,Date.parse(iv.start)), y=Math.min(b,Date.parse(iv.end)); if(y>x) s+=(y-x)/1000; });
   return s; }
 
+// qBraid ids look like "provider:company:type:name" (e.g. "aws:iqm:qpu:garnet")
+const COMPANY_NAMES={iqm:"IQM",ibm:"IBM",ionq:"IonQ",rigetti:"Rigetti",quera:"QuEra",aqt:"AQT",
+  pasqal:"Pasqal",quantinuum:"Quantinuum",oxford:"Oxford Ionics",aws:"AWS",qbraid:"qBraid",
+  azure:"Azure",openquantum:"OpenQuantum",other:"Other"};
+function parseDev(id){ const p=String(id).split(":");
+  return p.length>=4 ? {provider:p[0],company:p[1],name:p.slice(3).join(":")} : {provider:"",company:"other",name:String(id)}; }
+function companyLabel(c){ return COMPANY_NAMES[c] || (c?c.toUpperCase():"Other"); }
+function devLabel(id){ const d=parseDev(id); const n=d.name? d.name.charAt(0).toUpperCase()+d.name.slice(1) : id;
+  return d.provider ? `${n} · ${d.provider}` : n; }
+function byCompany(devices){ const g={}; devices.forEach(d=>{ const c=parseDev(d.device).company; (g[c]=g[c]||[]).push(d); }); return g; }
+function companiesSorted(g){ return Object.keys(g).sort((a,b)=>companyLabel(a).localeCompare(companyLabel(b))); }
+
 function renderCards(){
   const {covFrom,covTo}=rangeWindow(); const effSpan=(covTo-covFrom)/1000;
-  document.getElementById("cards").innerHTML = REPORT.devices.map(d=>{
+  const g=byCompany(REPORT.devices);
+  const card=d=>{
     const c=statusColor(d.current_status);
     const up = effSpan>0 ? Math.round((1-downSeconds(d,covFrom,covTo)/effSpan)*10000)/100 : null;
     return `<div class="card">
-      <div class="dev">${esc(d.device)}</div>
+      <div class="dev">${esc(devLabel(d.device))}</div>
       <div class="st"><span class="dot" style="background:${c}"></span>${esc(d.current_status)}</div>
       <div class="big">${up==null?"—":up+"%"}</div>
       <div class="muted" style="font-size:12px">uptime · ${RANGE_LABELS[RANGE].toLowerCase()}</div>
       <div class="muted" style="font-size:12px">last seen ${esc((d.last_seen||"").slice(0,16))}</div>
     </div>`;
-  }).join("") || `<div class="empty">No devices in the report yet.</div>`;
+  };
+  const html=companiesSorted(g).map(c=>
+    `<h3 class="company">${esc(companyLabel(c))} <span class="muted" style="font-weight:400;font-size:12px">· ${g[c].length}</span></h3>`+
+    `<div class="cards">`+g[c].map(card).join("")+`</div>`).join("");
+  document.getElementById("cards").innerHTML = html || `<div class="empty">No devices in the report yet.</div>`;
 }
 
 function fmtAxis(ms){ const iso=new Date(ms).toISOString();
@@ -141,7 +163,7 @@ function renderTimeline(){
   const W=Math.min(1000,(document.body.clientWidth||1000)-60), H=34, m={l:150,r:14};
   const iw=W-m.l-m.r;
   const px=ms=> m.l + Math.max(0,Math.min(1,(ms-from)/span))*iw;
-  el.innerHTML = REPORT.devices.map(d=>{
+  const track=d=>{
     // grey = no data over the range; green = observed & online; coloured = down intervals
     let bars=`<rect x="${m.l}" y="8" width="${iw}" height="16" rx="3" fill="var(--off)" opacity="0.16"/>`;
     const gx=px(covFrom), gw=px(covTo)-px(covFrom);
@@ -155,11 +177,14 @@ function renderTimeline(){
     });
     return `<div class="track">
       <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
-        <text x="0" y="20">${esc(d.device)}</text>${bars}
+        <text x="0" y="20">${esc(devLabel(d.device))}</text>${bars}
         <text x="${m.l}" y="${H-2}">${fmtAxis(from)}</text>
         <text x="${W-m.r}" y="${H-2}" text-anchor="end">${fmtAxis(to)}</text>
       </svg></div>`;
-  }).join("");
+  };
+  const g=byCompany(REPORT.devices);
+  el.innerHTML = companiesSorted(g).map(c=>
+    `<h3 class="company">${esc(companyLabel(c))}</h3>`+g[c].map(track).join("")).join("");
   wireTips();
 }
 
