@@ -1,0 +1,43 @@
+name: uptime-poll
+
+# Cloud cron: polls qBraid device status and commits the log back to the repo,
+# so the tracker runs 24/7 with no laptop. The uptime module is stdlib-only, so
+# there's nothing to pip install.
+on:
+  schedule:
+    # NOTE: cron can't express a clean "every 45 min"; "*/45" fires at :00 and
+    # :45 each hour (~2×/hour). GitHub's scheduler is also best-effort and can be
+    # delayed or skipped under load, so treat the sampling cadence as approximate.
+    - cron: "*/45 * * * *"
+  workflow_dispatch: {}   # lets you trigger a run by hand from the Actions tab
+
+permissions:
+  contents: write         # needed so the job can commit the updated log
+
+concurrency:
+  group: uptime-poll      # never let two poll runs overlap
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Poll qBraid + refresh report
+        env:
+          QBRAID_API_KEY: ${{ secrets.QBRAID_API_KEY }}
+        run: python -m qscrape.uptime poll --quiet
+
+      - name: Commit updated log + report
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/uptime_log.csv data/uptime.json
+          git commit -m "uptime: poll $(date -u +%FT%TZ)" || { echo "nothing to commit"; exit 0; }
+          git pull --rebase --autostash
+          git push

@@ -1,0 +1,19 @@
+{
+  "_note": [
+    "Availability tracker config. 'devices' are qBraid device ids (the 'qbraid_id'",
+    "field, e.g. 'iqm_garnet') exactly as they appear on qBraid. QBRAID_API_KEY is",
+    "read from the environment, never stored here. Poll runs via cron (see README).",
+    "'up_statuses' = statuses that count as available; everything else is downtime."
+  ],
+  "api_base": "https://api-v2.qbraid.com/api/v1",
+  "devices_endpoint": "/devices",
+  "auth_header": "X-API-KEY",
+  "poll_interval_seconds": 300,
+  "_devices_note": "Use [\"*\"] to track every device from the single API response, or list specific qrn ids like \"aws:iqm:qpu:garnet\". Simulators are skipped when exclude_simulators is true.",
+  "devices": ["*"],
+  "exclude_simulators": true,
+  "up_statuses": ["ONLINE"],
+  "log_path": "data/uptime_log.csv",
+  "report_path": "data/uptime.json",
+  "schedule_path": "config/uptime_schedule.json"
+}

@@ -155,10 +155,69 @@ Include ONLY the fields you actually found. If you found nothing beyond the qubi
 4. Test just that vendor: `.venv/bin/python -m qscrape --only <vendor>`, then do a full run.
 5. Spot-check the numbers — browsing models sometimes misread tables, so treat each entry as unverified until I've eyeballed it (that's what the `_status: ...verify` line is for).
 
+## Live availability tracking (`qscrape.uptime`)
+
+Separate little subsystem that tracks the *real* uptime/downtime of my devices —
+including the unscheduled outages (maintenance, calibration failures) that never
+show on the published schedule. It polls the live status on a timer and logs it,
+then diffs against the schedule I enter by hand.
+
+- **Source:** qBraid's REST API (`GET /quantum-devices`, `api-key` header) over
+  the same stdlib `urllib` — no SDK dependency. `QBRAID_API_KEY` comes from the env.
+- **Store:** appends `data/uptime_log.csv` (`timestamp_utc, device_id, status, status_msg`).
+  A regular time-series is justified here (unlike the price data) because it's polled on a fixed cadence.
+- **Config:** `config/uptime.json` (device ids as they appear on qBraid + poll interval);
+  `config/uptime_schedule.json` (the schedule read off my Resonance account by hand —
+  IQM has no schedule API). Outages overlapping a planned window are tagged `scheduled`;
+  the rest are the `unscheduled` ones I care about.
+- **UI:** `uptime.html` (static, reads `data/uptime.json`) — current status per device,
+  an up/down timeline, and the filtered unscheduled-outage list.
+
+```bash
+export QBRAID_API_KEY=<your qBraid key>
+.venv/bin/python -m qscrape.uptime poll     # query + append a sample + refresh data/uptime.json
+.venv/bin/python -m qscrape.uptime report   # rebuild the report from the log only
+```
+
+Missing key or empty device list → it skips cleanly and never crashes (safe for cron).
+
+**Run it every 5 minutes with cron** (`crontab -e`). Note cron doesn't inherit your
+shell env, so set the key inside the crontab:
+
+```cron
+QBRAID_API_KEY=your_key_here
+*/5 * * * * cd /Users/you/Job/eleQtron && .venv/bin/python -m qscrape.uptime poll --quiet >> data/uptime_cron.log 2>&1
+```
+
+(On macOS, cron needs Full Disk Access, or use a `launchd` plist instead — ask if you want one.)
+
+### Hosted 24/7 via GitHub Actions (no laptop)
+
+`.github/workflows/uptime.yml` runs the poll in the cloud on a schedule and commits
+`data/uptime_log.csv` + `data/uptime.json` back to the repo — so the tracker runs
+without any machine of mine being on, and the Pages `uptime.html` shows the data.
+
+Setup (one-time):
+1. **Add the API key as a secret:** repo → Settings → Secrets and variables → Actions →
+   New repository secret → name `QBRAID_API_KEY`, value = your key. (It never appears in
+   the repo or the logs.)
+2. Push the workflow + code. It then runs on the schedule, or on demand from the Actions tab.
+
+Trade-offs to know:
+- The cron `*/45 * * * *` fires at :00 and :45; GitHub's scheduler is **best-effort**
+  (can be delayed or skipped under load), so sampling is approximate, not exact.
+- Each poll makes **one commit** (`uptime: poll <ts>`), so history fills with data commits.
+- Free Actions minutes (2000/mo on private repos) comfortably cover ~48 runs/day; going
+  much more frequent would need a paid plan or a dedicated always-on poller instead.
+
+`data/uptime_log.csv` and `data/uptime.json` are **tracked** (the Action commits them);
+only `data/uptime_cron.log` (local cron output) is gitignored.
+
 ## A few things worth knowing
 
-- **No time series.** My price data was collected on random dates, not a regular
-  schedule, so the charts are a current snapshot, not a trend over time.
+- **No time series (for the *price/spec* tracker).** That data was collected on random
+  dates, not a regular schedule, so the charts are a current snapshot, not a trend.
+  (The availability tracker above *is* a real time-series — it's polled on a fixed timer.)
 - **`theoretical_max`** (`2^min(N, 1/error)`) is a rough headroom number — I keep
   it but trust measured Quantum Volume more.
 - **Re-running is safe.** It rebuilds from the sources, and the JSON diffs cleanly

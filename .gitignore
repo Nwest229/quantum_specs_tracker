@@ -9,3 +9,7 @@ data/quantum_tracker.xlsx
 # built snapshot needs to be in the repo. Re-commit it after a fresh run.
 
 .DS_Store
+
+# uptime tracker: log + report ARE tracked — the GitHub Actions poller commits
+# them so the data is hosted (and the Pages uptime.html can read it).
+data/uptime_cron.log

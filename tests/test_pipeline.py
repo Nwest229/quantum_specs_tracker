@@ -348,6 +348,75 @@ class TestBraketAdapter(unittest.TestCase):
         self.assertFalse(rec.fidelity.get("2q_avg"))
 
 
+class TestUptime(unittest.TestCase):
+    def _s(self, t, dev, status):
+        from qscrape.uptime import parse_iso
+        return {"ts": parse_iso(t), "device": dev, "status": status, "msg": ""}
+
+    def test_collapse_downtime_interval(self):
+        from qscrape.uptime import collapse_intervals
+        samples = [self._s("2026-07-20T00:00:00Z", "g", "ONLINE"),
+                   self._s("2026-07-20T00:05:00Z", "g", "OFFLINE"),
+                   self._s("2026-07-20T00:10:00Z", "g", "OFFLINE"),
+                   self._s("2026-07-20T00:15:00Z", "g", "ONLINE")]
+        ivs = collapse_intervals(samples, ["ONLINE"])
+        self.assertEqual(len(ivs), 1)
+        self.assertEqual(ivs[0]["duration_s"], 600)   # 00:05 -> 00:15
+        self.assertFalse(ivs[0]["ongoing"])
+
+    def test_ongoing_and_poll_error(self):
+        from qscrape.uptime import collapse_intervals
+        ongoing = collapse_intervals(
+            [self._s("2026-07-20T00:00:00Z", "g", "ONLINE"),
+             self._s("2026-07-20T00:05:00Z", "g", "UNAVAILABLE")], ["ONLINE"])
+        self.assertTrue(ongoing[0]["ongoing"])
+        # a POLL_ERROR gap is not device downtime
+        gap = collapse_intervals(
+            [self._s("2026-07-20T00:00:00Z", "g", "ONLINE"),
+             self._s("2026-07-20T00:05:00Z", "g", "POLL_ERROR"),
+             self._s("2026-07-20T00:10:00Z", "g", "ONLINE")], ["ONLINE"])
+        self.assertEqual(gap, [])
+
+    def test_classify_scheduled_vs_unscheduled(self):
+        from qscrape.uptime import classify, parse_iso
+        sched = {"maintenance": [{"start": "2026-07-22T08:00:00Z", "end": "2026-07-22T12:00:00Z"}]}
+        inside = {"start": parse_iso("2026-07-22T09:00:00Z"), "end": parse_iso("2026-07-22T10:00:00Z")}
+        outside = {"start": parse_iso("2026-07-23T09:00:00Z"), "end": parse_iso("2026-07-23T10:00:00Z")}
+        self.assertEqual(classify(inside, sched), "scheduled")
+        self.assertEqual(classify(outside, sched), "unscheduled")
+        self.assertEqual(classify(inside, {}), "outage")   # no schedule -> can't call it unscheduled
+
+    def test_classify_off_hours(self):
+        from qscrape.uptime import classify, parse_iso
+        sched = {"available_24_7": False,
+                 "available_windows": [{"days": [0, 1, 2, 3, 4], "start": "08:00", "end": "18:00"}]}
+        sunday = {"start": parse_iso("2026-07-19T09:00:00Z"), "end": parse_iso("2026-07-19T10:00:00Z")}
+        monday = {"start": parse_iso("2026-07-20T09:00:00Z"), "end": parse_iso("2026-07-20T10:00:00Z")}
+        self.assertEqual(classify(sunday, sched), "off-hours")     # Sun, outside window
+        self.assertEqual(classify(monday, sched), "unscheduled")   # Mon during hours
+
+    def test_build_report_end_to_end(self):
+        import tempfile
+        from qscrape.uptime import build_report
+        with tempfile.TemporaryDirectory() as td:
+            log = os.path.join(td, "log.csv")
+            with open(log, "w") as fh:
+                fh.write("timestamp_utc,device_id,status,status_msg\n"
+                         "2026-07-20T00:00:00+00:00,iqm_garnet,ONLINE,\n"
+                         "2026-07-20T00:05:00+00:00,iqm_garnet,OFFLINE,\n"
+                         "2026-07-20T00:10:00+00:00,iqm_garnet,ONLINE,\n")
+            sched = os.path.join(td, "sched.json")
+            with open(sched, "w") as fh:
+                json.dump({"devices": {"iqm_garnet": {"available_24_7": True, "maintenance": []}}}, fh)
+            rep = build_report({"log_path": log, "report_path": os.path.join(td, "r.json"),
+                                "schedule_path": sched, "up_statuses": ["ONLINE"]})
+            self.assertEqual(len(rep["devices"]), 1)
+            dev = rep["devices"][0]
+            self.assertEqual(dev["current_status"], "ONLINE")
+            self.assertEqual(len(dev["intervals"]), 1)
+            self.assertEqual(len(dev["unscheduled"]), 1)   # scheduled device, outage outside maintenance
+
+
 class TestSchemaValidates(unittest.TestCase):
     def test_output_matches_schema(self):
         try:

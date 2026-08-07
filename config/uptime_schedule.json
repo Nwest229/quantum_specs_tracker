@@ -1,0 +1,36 @@
+{
+  "_readme": [
+    "The PUBLISHED schedule you read off your IQM Resonance account, entered by",
+    "hand (IQM has no schedule API). It's used to split observed downtime into",
+    "'scheduled' vs the 'unscheduled' outages you actually care about.",
+    "",
+    "Per device you can set:",
+    "  maintenance        : one-off planned-downtime windows (UTC, ISO-8601).",
+    "                       An outage overlapping one is tagged 'scheduled'.",
+    "  available_24_7     : true if the device is meant to be online around the clock.",
+    "  available_windows  : recurring weekly windows it's meant to be up, UTC.",
+    "                       days = 0..6 (Mon..Sun), start/end = 'HH:MM'. An outage",
+    "                       entirely outside these is tagged 'off-hours' (expected).",
+    "",
+    "If a device has no entry here it's assumed 24/7 online, so any OFFLINE is",
+    "'unscheduled'. Delete the example below and add your real devices."
+  ],
+  "devices": {
+    "aws:iqm:qpu:garnet": {
+      "available_24_7": true,
+      "available_windows": [],
+      "maintenance": [
+        {
+          "start": "2026-08-11T08:00:00Z",
+          "end": "2026-08-11T12:00:00Z",
+          "note": "EXAMPLE — replace with the real calibration/maintenance window you read off Resonance"
+        }
+      ]
+    },
+    "aws:iqm:qpu:emerald": {
+      "available_24_7": true,
+      "available_windows": [],
+      "maintenance": []
+    }
+  }
+}

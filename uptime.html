@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Device Availability Tracker</title>
+<style>
+  :root{ --bg:#0f1115; --panel:#171a21; --line:#272b35; --fg:#e6e8ee; --muted:#8b93a7;
+    --accent:#6ea8fe; --up:#3fb68b; --unsched:#e06c75; --sched:#e0a34e; --off:#5a6072; --chip:#232734; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  h1{font-size:17px;margin:0;font-weight:650;}
+  .sub{color:var(--muted);font-size:12.5px;}
+  .controls{margin-left:auto;display:flex;gap:10px;align-items:center;}
+  button,label.file{background:var(--chip);color:var(--fg);border:1px solid var(--line);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:13px;}
+  button:hover,label.file:hover{border-color:var(--accent);}
+  input[type=file]{display:none;}
+  .wrap{padding:18px 22px 60px;}
+  .cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:200px;}
+  .card .dev{font-weight:650;font-size:14px;margin-bottom:6px;}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+  .st{font-size:13px;} .muted{color:var(--muted);}
+  .big{font-size:22px;font-weight:650;margin:6px 0 2px;}
+  h2{font-size:14px;color:var(--muted);font-weight:600;margin:24px 0 10px;text-transform:uppercase;letter-spacing:.04em;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px;}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .track{margin-bottom:6px;}
+  .track .lbl{font-size:12.5px;color:var(--fg);margin-bottom:2px;}
+  table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;margin-top:6px;}
+  th,td{text-align:left;padding:7px 11px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px;}
+  th{color:var(--muted);font-weight:600;}
+  .tag{font-size:11px;padding:1px 7px;border-radius:20px;border:1px solid;}
+  .tag.unsched{color:var(--unsched);border-color:var(--unsched);}
+  .tag.ongoing{color:var(--sched);border-color:var(--sched);}
+  .empty{color:var(--muted);padding:14px 0;}
+  .tip{position:fixed;pointer-events:none;background:#000d;border:1px solid var(--line);padding:6px 9px;border-radius:7px;font-size:12px;z-index:99;display:none;max-width:260px;}
+  .banner{background:#1c2130;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--muted);font-size:12.5px;}
+  svg text{fill:var(--muted);font-size:10.5px;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Device Availability Tracker</h1>
+    <div class="sub" id="subtitle">Load <code>data/uptime.json</code> to begin</div>
+  </div>
+  <div class="controls">
+    <label class="file">Open JSON<input type="file" id="file" accept="application/json,.json"></label>
+    <button id="reload">↻ Reload</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="banner"></div>
+  <div class="cards" id="cards"></div>
+
+  <h2>Uptime timeline</h2>
+  <div class="legend">
+    <span><i style="background:var(--up)"></i>online</span>
+    <span><i style="background:#b5545e"></i>outage (no schedule)</span>
+    <span><i style="background:var(--unsched)"></i>unscheduled outage</span>
+    <span><i style="background:var(--sched)"></i>scheduled maintenance</span>
+    <span><i style="background:var(--off)"></i>off-hours (expected)</span>
+  </div>
+  <div id="timeline"></div>
+
+  <h2>Unscheduled outages <span class="muted" id="unschedCount"></span></h2>
+  <div id="unsched"></div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+let REPORT=null;
+const CLS_COLOR={unscheduled:"var(--unsched)", scheduled:"var(--sched)", "off-hours":"var(--off)", outage:"#b5545e"};
+
+function statusColor(s){ return (s==="ONLINE") ? "var(--up)" : (/(POLL_ERROR|UNKNOWN|NOT_FOUND)/.test(s) ? "var(--off)" : "var(--unsched)"); }
+function fmtDur(sec){ if(sec==null) return "—"; const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);
+  return h? `${h}h ${m}m` : (m? `${m}m` : `${sec}s`); }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+
+function render(){
+  if(!REPORT){ return; }
+  document.getElementById("subtitle").textContent =
+    `generated ${REPORT.generated} · window ${(REPORT.window.from||"—").slice(0,16)} → ${(REPORT.window.to||"—").slice(0,16)}`;
+  renderCards();
+  renderTimeline();
+  renderUnscheduled();
+}
+
+function renderCards(){
+  document.getElementById("cards").innerHTML = REPORT.devices.map(d=>{
+    const c=statusColor(d.current_status);
+    return `<div class="card">
+      <div class="dev">${esc(d.device)}</div>
+      <div class="st"><span class="dot" style="background:${c}"></span>${esc(d.current_status)}</div>
+      <div class="big">${d.uptime_pct==null?"—":d.uptime_pct+"%"}</div>
+      <div class="muted" style="font-size:12px">uptime over window · ${d.samples} samples</div>
+      <div class="muted" style="font-size:12px">last seen ${esc((d.last_seen||"").slice(0,16))}</div>
+    </div>`;
+  }).join("") || `<div class="empty">No devices in the report yet.</div>`;
+}
+
+function renderTimeline(){
+  const el=document.getElementById("timeline");
+  const t0=Date.parse(REPORT.window.from), t1=Date.parse(REPORT.window.to);
+  if(!(t1>t0)){ el.innerHTML=`<div class="empty">Not enough data for a timeline yet — the poller needs a few samples.</div>`; return; }
+  const W=Math.min(1000,(document.body.clientWidth||1000)-60), H=34, m={l:120,r:12};
+  const iw=W-m.l-m.r;
+  const px=t=> m.l + (Date.parse(t)-t0)/(t1-t0)*iw;
+  el.innerHTML = REPORT.devices.map(d=>{
+    let bars=`<rect x="${m.l}" y="8" width="${iw}" height="16" rx="3" fill="var(--up)" opacity="0.28"/>`;
+    (d.intervals||[]).forEach(iv=>{
+      const x=px(iv.start), w=Math.max(2, px(iv.end)-px(iv.start));
+      const col=CLS_COLOR[iv.class]||"var(--unsched)";
+      bars+=`<rect x="${x}" y="8" width="${w}" height="16" rx="2" fill="${col}" class="seg"
+        data-t="${esc(d.device+' · '+iv.class+' · '+iv.start.slice(11,16)+'→'+iv.end.slice(11,16)+' ('+fmtDur(iv.duration_s)+') '+iv.statuses.join(','))}"/>`;
+    });
+    return `<div class="track"><div class="lbl">${esc(d.device)}</div>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+        <text x="0" y="20">${esc(d.device)}</text>${bars}
+        <text x="${m.l}" y="${H-2}">${(REPORT.window.from||"").slice(11,16)}</text>
+        <text x="${W-m.r}" y="${H-2}" text-anchor="end">${(REPORT.window.to||"").slice(11,16)}</text>
+      </svg></div>`;
+  }).join("");
+  wireTips();
+}
+
+function renderUnscheduled(){
+  const all=[];
+  REPORT.devices.forEach(d=> (d.unscheduled||[]).forEach(iv=>all.push(iv)));
+  all.sort((a,b)=> Date.parse(b.start)-Date.parse(a.start));
+  document.getElementById("unschedCount").textContent = `(${all.length})`;
+  const box=document.getElementById("unsched");
+  if(!all.length){ box.innerHTML=`<div class="empty">No unscheduled outages detected. 🎉</div>`; return; }
+  box.innerHTML = `<table><tr><th>Device</th><th>Start (UTC)</th><th>End (UTC)</th><th>Duration</th><th>Status</th><th></th></tr>`+
+    all.map(iv=>`<tr>
+      <td>${esc(iv.device)}</td>
+      <td>${esc(iv.start.replace('T',' ').slice(0,16))}</td>
+      <td>${esc(iv.ongoing?'— (ongoing)':iv.end.replace('T',' ').slice(0,16))}</td>
+      <td>${fmtDur(iv.duration_s)}</td>
+      <td>${esc(iv.statuses.join(', '))}</td>
+      <td>${iv.ongoing?'<span class="tag ongoing">ongoing</span>':'<span class="tag unsched">unscheduled</span>'}</td>
+    </tr>`).join("")+`</table>`;
+}
+
+function wireTips(){
+  const tip=document.getElementById("tip");
+  document.querySelectorAll(".seg").forEach(el=>{
+    el.addEventListener("mousemove",e=>{tip.style.display="block";tip.textContent=el.dataset.t;
+      tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY+12)+"px";});
+    el.addEventListener("mouseleave",()=>tip.style.display="none");
+  });
+}
+
+function load(obj,name){
+  REPORT=obj;
+  document.getElementById("banner").innerHTML="";
+  render();
+}
+document.getElementById("file").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return; f.text().then(t=>load(JSON.parse(t),f.name));
+});
+document.getElementById("reload").addEventListener("click",()=>autoload(true));
+
+function autoload(force){
+  if(location.protocol==="file:" && !force){
+    document.getElementById("banner").innerHTML=`<div class="banner">Serve the folder (<code>python3 -m http.server</code>) to auto-load <code>data/uptime.json</code>, or use <b>Open JSON</b>.</div>`;
+    return;
+  }
+  fetch("data/uptime.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)
+    .then(j=>{ if(j) load(j,"data/uptime.json");
+      else document.getElementById("banner").innerHTML=`<div class="banner">No <code>data/uptime.json</code> yet — run <code>.venv/bin/python -m qscrape.uptime poll</code> (or set up the cron job) to start collecting.</div>`; })
+    .catch(()=>{});
+}
+autoload();
+</script>
+</body>
+</html>
