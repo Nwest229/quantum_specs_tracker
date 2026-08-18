@@ -65,6 +65,18 @@
   .empty{color:var(--muted);padding:14px 0;}
   .tip{position:fixed;pointer-events:none;background:#000d;border:1px solid var(--line);padding:6px 9px;border-radius:7px;font-size:12px;z-index:99;display:none;max-width:280px;}
   .banner{background:#1c2130;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--muted);font-size:12.5px;margin-bottom:12px;}
+
+  /* compare-across-providers panel */
+  .cmp-toggle{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:600;color:var(--fg);cursor:pointer;}
+  .cmp-toggle:hover{border-color:var(--accent);}
+  .cmp-toggle #cmpCaret{color:var(--accent);margin-right:4px;}
+  .cmp-body{margin-top:10px;display:flex;flex-direction:column;gap:12px;}
+  .cmp-row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;overflow-x:auto;}
+  .cmp-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:6px;}
+  .cmp-plat{font-size:14px;font-weight:650;}
+  .cmp-badge{font-size:10.5px;padding:1px 8px;border-radius:20px;border:1px solid var(--accent);color:var(--accent);}
+  .cmp-stat{font-size:12.5px;}
+  .cmp-up{font-size:12.5px;margin-left:auto;}
 </style>
 </head>
 <body>
@@ -96,6 +108,9 @@ const WEEKDAY=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const COMPANY_NAMES={iqm:"IQM",ibm:"IBM",ionq:"IonQ",rigetti:"Rigetti",quera:"QuEra",aqt:"AQT",
   pasqal:"Pasqal",quantinuum:"Quantinuum",oxford:"Oxford Ionics",aws:"AWS",qbraid:"qBraid",
   azure:"Azure",openquantum:"OpenQuantum",other:"Other"};
+// the first qrn segment = the platform/API a machine is reachable on
+const PLATFORM_NAMES={aws:"AWS Braket",azure:"Azure Quantum",ibm:"IBM Quantum",ionq:"IonQ (direct)",
+  rigetti:"Rigetti (direct)",openquantum:"OpenQuantum",qbraid:"qBraid",other:"Other"};
 
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
 function statusColor(s){ return (s==="ONLINE") ? "var(--up)" : (/(POLL_ERROR|UNKNOWN|NOT_FOUND)/.test(s) ? "var(--off)" : "var(--unsched)"); }
@@ -110,6 +125,7 @@ function mName(id){ const d=parseDev(id); return d.name ? d.name.charAt(0).toUpp
 function mRoute(id){ const d=parseDev(id); return d.provider ? "via "+d.provider : ""; }
 function byCompany(devices){ const g={}; devices.forEach(d=>{ (g[parseDev(d.device).company]=g[parseDev(d.device).company]||[]).push(d); }); return g; }
 function companiesSorted(g){ return Object.keys(g).sort((a,b)=>companyLabel(a).localeCompare(companyLabel(b))); }
+function platformLabel(p){ return PLATFORM_NAMES[p] || (p?p.toUpperCase():"Other"); }
 
 function rangeWindow(){
   const to=Date.parse(REPORT.window.to), wf=Date.parse(REPORT.window.from);
@@ -127,17 +143,31 @@ function render(){
     `${REPORT.devices.length} devices · data from ${(REPORT.window.from||"—").slice(0,10)} · generated ${(REPORT.generated||"").slice(0,16)} UTC`;
   const g=byCompany(REPORT.devices);
   if(!COMPANY || !g[COMPANY]) return renderCompanies(g);
-  if(!MACHINE || !g[COMPANY].some(d=>d.device===MACHINE)) return renderMachines(g);
+  if(!MACHINE || !machinesOf(COMPANY,g).some(m=>m.rep.device===MACHINE)) return renderMachines(g);
   renderScheduleView(g);
+}
+
+/* group a company's devices into unique physical machines, each with its provider routes */
+function machinesOf(company,g){
+  const seen={}; (g[company]||[]).forEach(d=>{ const k=parseDev(d.device).name.toLowerCase(); (seen[k]=seen[k]||[]).push(d); });
+  return Object.keys(seen).sort().map(k=>{
+    const routes=seen[k].sort((a,b)=>platformLabel(parseDev(a.device).provider).localeCompare(platformLabel(parseDev(b.device).provider)));
+    return {name:mName(routes[0].device), routes, rep:routes[0]};
+  });
+}
+function routesFor(deviceId){
+  const d0=parseDev(deviceId), k=d0.company+"::"+d0.name.toLowerCase();
+  return REPORT.devices.filter(x=>{ const p=parseDev(x.device); return p.company+"::"+p.name.toLowerCase()===k; })
+    .sort((a,b)=>platformLabel(parseDev(a.device).provider).localeCompare(platformLabel(parseDev(b.device).provider)));
 }
 
 /* step 1 — companies */
 function renderCompanies(g){
   const cards=companiesSorted(g).map(c=>{
-    const ms=g[c], online=ms.filter(d=>d.current_status==="ONLINE").length;
+    const ms=g[c], online=ms.filter(d=>d.current_status==="ONLINE").length, nmach=machinesOf(c,g).length;
     return `<button class="bigcard" data-c="${c}">
       <div class="bc-title">${esc(companyLabel(c))}</div>
-      <div class="bc-sub">${ms.length} machine${ms.length>1?"s":""}</div>
+      <div class="bc-sub">${nmach} machine${nmach>1?"s":""} · ${ms.length} provider route${ms.length>1?"s":""}</div>
       <div class="bc-sub"><span class="dot" style="background:var(--up)"></span>${online} online · ${ms.length-online} not</div>
     </button>`;
   }).join("");
@@ -145,14 +175,18 @@ function renderCompanies(g){
   document.querySelectorAll(".bigcard").forEach(b=> b.onclick=()=>{ COMPANY=b.dataset.c; MACHINE=null; render(); });
 }
 
-/* step 2 — machines of a company */
+/* step 2 — machines of a company (deduped across provider routes) */
 function renderMachines(g){
-  const ms=g[COMPANY]||[];
-  const cards=ms.map(d=>`<button class="bigcard" data-m="${esc(d.device)}">
-      <div class="bc-title">${esc(mName(d.device))}</div>
-      <div class="bc-sub">${esc(mRoute(d.device))}</div>
-      <div class="bc-sub"><span class="dot" style="background:${statusColor(d.current_status)}"></span>${esc(d.current_status)}</div>
-    </button>`).join("");
+  const mm=machinesOf(COMPANY,g);
+  const cards=mm.map(m=>{
+    const online=m.routes.filter(r=>r.current_status==="ONLINE").length, n=m.routes.length;
+    const plats=m.routes.map(r=>platformLabel(parseDev(r.device).provider)).join(", ");
+    return `<button class="bigcard" data-m="${esc(m.rep.device)}">
+      <div class="bc-title">${esc(m.name)}</div>
+      <div class="bc-sub">${n>1?n+" providers":"1 provider"} · ${esc(plats)}</div>
+      <div class="bc-sub"><span class="dot" style="background:${online?'var(--up)':'var(--off)'}"></span>${online}/${n} online</div>
+    </button>`;
+  }).join("");
   document.getElementById("view").innerHTML =
     `<div class="crumb"><a class="crumblink" id="toCompanies">Companies</a><span class="muted">›</span><b>${esc(companyLabel(COMPANY))}</b></div>
      <h2>${esc(companyLabel(COMPANY))} · machines</h2><div class="grid">${cards}</div>`;
@@ -170,7 +204,7 @@ function renderScheduleView(g){
     <div class="crumb">
       <a class="crumblink" id="toCompanies">Companies</a><span class="muted">›</span>
       <a class="crumblink" id="toMachines">${esc(companyLabel(COMPANY))}</a><span class="muted">›</span>
-      <b>${esc(mName(d.device))}</b>
+      <b>${esc(mName(d.device))} <span class="muted" style="font-weight:400">${esc(mRoute(d.device))}</span></b>
     </div>
     <div id="machinehead">
       <div class="mname">${esc(mName(d.device))} <span class="muted" style="font-size:13px;font-weight:400">${esc(mRoute(d.device))}</span>
@@ -187,13 +221,49 @@ function renderScheduleView(g){
     </div>
     <div id="schedule"></div>
     <h2>Outages <span class="muted" id="outCount"></span></h2>
-    <div id="outages"></div>`;
+    <div id="outages"></div>
+    <h2>Compare across providers</h2>
+    <div id="compare"></div>`;
   document.getElementById("toCompanies").onclick=()=>{ COMPANY=null; MACHINE=null; render(); };
   document.getElementById("toMachines").onclick=()=>{ MACHINE=null; render(); };
   document.querySelectorAll(".pickrow .rangebtn").forEach(b=> b.onclick=()=>{ RANGE=b.dataset.r; renderScheduleView(g); });
   document.getElementById("schedule").innerHTML = agendaHTML(d);
   renderOutages(d);
+  renderCompare(d);
   wireTips();
+}
+
+/* collapsible panel: the SAME machine on every other provider route, for side-by-side comparison */
+function renderCompare(d){
+  const box=document.getElementById("compare"); if(!box) return;
+  const routes=routesFor(d.device);
+  if(routes.length<2){
+    box.innerHTML=`<div class="empty">Only reachable via ${esc(platformLabel(parseDev(d.device).provider))} — no other provider to compare against.</div>`;
+    return;
+  }
+  const others=routes.length-1;
+  box.innerHTML=`<button class="cmp-toggle" id="cmpToggle"><span id="cmpCaret">▸</span> Compare this machine on ${others} other provider${others>1?"s":""}</button>
+    <div id="cmpBody" class="cmp-body" hidden></div>`;
+  const body=document.getElementById("cmpBody"), caret=document.getElementById("cmpCaret");
+  document.getElementById("cmpToggle").onclick=()=>{
+    if(!body.hidden){ body.hidden=true; caret.textContent="▸"; return; }
+    body.hidden=false; caret.textContent="▾";
+    const {covFrom,covTo}=rangeWindow(), effSpan=(covTo-covFrom)/1000;
+    body.innerHTML=routes.map(r=>{
+      const up=effSpan>0?Math.round((1-downSeconds(r,covFrom,covTo)/effSpan)*10000)/100:null;
+      const cur=r.device===d.device, prov=parseDev(r.device).provider;
+      return `<div class="cmp-row">
+        <div class="cmp-head">
+          <span class="cmp-plat">${esc(platformLabel(prov))}</span>
+          ${cur?'<span class="cmp-badge">this view</span>':''}
+          <span class="cmp-stat"><span class="dot" style="background:${statusColor(r.current_status)}"></span>${esc(r.current_status)}</span>
+          <span class="cmp-up muted">uptime ${up==null?"—":"<b style='color:var(--fg)'>"+up+"%</b>"}</span>
+        </div>
+        ${agendaHTML(r)}
+      </div>`;
+    }).join("");
+    wireTips();
+  };
 }
 
 /* the day-by-day schedule (fixed-pixel SVG so text stays crisp, rows compact) */
