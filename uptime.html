@@ -77,6 +77,20 @@
   .cmp-badge{font-size:10.5px;padding:1px 8px;border-radius:20px;border:1px solid var(--accent);color:var(--accent);}
   .cmp-stat{font-size:12.5px;}
   .cmp-up{font-size:12.5px;margin-left:auto;}
+
+  /* OEE loss breakdown */
+  .oee-head{font-size:13.5px;margin:2px 0 10px;}
+  .oee-wf{display:flex;height:20px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--off);}
+  .oee-wf .wf-seg{height:100%;}
+  .oee-cap{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin:7px 0 16px;}
+  .oee-cap i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .lossbars{display:flex;flex-direction:column;gap:9px;}
+  .lossrow{display:grid;grid-template-columns:130px 1fr 150px;align-items:center;gap:12px;}
+  .losslbl{font-size:12.5px;}
+  .losstrack{height:14px;background:var(--chip);border:1px solid var(--line);border-radius:7px;overflow:hidden;}
+  .lossfill{height:100%;}
+  .lossval{font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;}
+  .oee-note{font-size:11.5px;margin-top:14px;line-height:1.55;}
 </style>
 </head>
 <body>
@@ -100,7 +114,7 @@
 <div class="tip" id="tip"></div>
 
 <script>
-let REPORT=null, COMPANY=null, MACHINE=null, RANGE="week";
+let REPORT=null, SCHED={}, COMPANY=null, MACHINE=null, RANGE="week";
 const RANGES={day:864e5, week:6048e5, month:2592e6};
 const RANGE_LABELS={day:"Day", week:"Week", month:"Month"};
 const CLS_COLOR={unscheduled:"var(--unsched)", scheduled:"var(--sched)", "off-hours":"var(--off)", outage:"#b5545e"};
@@ -135,6 +149,44 @@ function rangeWindow(){
 function downSeconds(d,a,b){ let s=0;
   (d.intervals||[]).forEach(iv=>{ const x=Math.max(a,Date.parse(iv.start)), y=Math.min(b,Date.parse(iv.end)); if(y>x) s+=(y-x)/1000; });
   return s; }
+
+/* ---------- OEE loss model ----------
+   All Time − Schedule Loss = Planned Production − Availability Loss = Run Time
+   − Performance Loss = Net Run Time − Quality Loss = Fully Productive.
+   We can only *measure* availability loss (downtime) and, where a manual
+   schedule exists, schedule loss. Performance & quality need job-level data. */
+function downByClass(d,a,b,classes){ let s=0;
+  (d.intervals||[]).forEach(iv=>{ if(classes && classes.indexOf(iv.class)<0) return;
+    const ivEnd = iv.ongoing ? Math.max(Date.parse(iv.end),b) : Date.parse(iv.end);
+    const x=Math.max(a,Date.parse(iv.start)), y=Math.min(b,ivEnd); if(y>x) s+=(y-x)/1000; });
+  return s; }
+function overlapSec(a,b,list){ let s=0; (list||[]).forEach(w=>{
+  const x=Math.max(a,Date.parse(w.start)), y=Math.min(b,Date.parse(w.end)); if(y>x) s+=(y-x)/1000; }); return s; }
+function plannedUpSec(a,b,wins){ // seconds inside any weekly UTC window (hourly step)
+  const H=36e5; let up=0;
+  for(let t=a;t<b;t+=H){ const seg=(Math.min(b,t+H)-t)/1000, dt=new Date(t);
+    const cfgDay=(dt.getUTCDay()+6)%7, mins=dt.getUTCHours()*60+dt.getUTCMinutes();
+    const inWin=wins.some(w=>{ if((w.days||[]).indexOf(cfgDay)<0) return false;
+      const [sh,sm]=w.start.split(":").map(Number), [eh,em]=w.end.split(":").map(Number);
+      return mins>=sh*60+sm && mins<eh*60+em; });
+    if(inWin) up+=seg; }
+  return up; }
+function scheduleLoss(devId,a,b){ const sc=SCHED[devId], total=(b-a)/1000;
+  if(!sc) return {sec:0, defined:false};                 // no schedule → assume 24/7 intent
+  let loss=overlapSec(a,b,sc.maintenance);               // planned maintenance = deliberate downtime
+  const wins=sc.available_windows||[];
+  if(wins.length && !sc.available_24_7) loss += total - plannedUpSec(a,b,wins);
+  return {sec:Math.min(loss,total), defined:true}; }
+function oeeFor(d){
+  const {covFrom,covTo}=rangeWindow(), total=(covTo-covFrom)/1000;
+  const sl=scheduleLoss(d.device,covFrom,covTo);
+  const unsched=downByClass(d,covFrom,covTo,["unscheduled"]);
+  const outage=downByClass(d,covFrom,covTo,["outage"]);
+  const availLoss=unsched+outage;                        // unplanned downtime during planned time
+  const planned=Math.max(0,total-sl.sec);
+  const productive=Math.max(0,planned-availLoss);        // run time (perf/quality unmeasured → best case)
+  return {total, schedLoss:sl.sec, schedDefined:sl.defined, availLoss, unsched, outage,
+          planned, productive, availability: planned>0 ? productive/planned : null}; }
 
 /* ---------- step router ---------- */
 function render(){
@@ -220,6 +272,8 @@ function renderScheduleView(g){
       <span><i style="background:var(--off)"></i>no data</span>
     </div>
     <div id="schedule"></div>
+    <h2>OEE loss breakdown</h2>
+    <div id="oee"></div>
     <h2>Outages <span class="muted" id="outCount"></span></h2>
     <div id="outages"></div>
     <h2>Compare across providers</h2>
@@ -228,9 +282,49 @@ function renderScheduleView(g){
   document.getElementById("toMachines").onclick=()=>{ MACHINE=null; render(); };
   document.querySelectorAll(".pickrow .rangebtn").forEach(b=> b.onclick=()=>{ RANGE=b.dataset.r; renderScheduleView(g); });
   document.getElementById("schedule").innerHTML = agendaHTML(d);
+  renderOEE(d);
   renderOutages(d);
   renderCompare(d);
   wireTips();
+}
+
+/* per-machine OEE loss bars for the selected range */
+function renderOEE(d){
+  const box=document.getElementById("oee"); if(!box) return;
+  const o=oeeFor(d), pct=s=> o.total>0 ? s/o.total*100 : 0;
+  const rangeName=RANGE_LABELS[RANGE].toLowerCase();
+  const availPct = o.availability==null?null:Math.round(o.availability*1000)/10;
+  const gp=pct(o.productive), ap=pct(o.availLoss), sp=pct(o.schedLoss);
+  const bar=(label,p,color,opts)=>{ opts=opts||{};
+    const w = p==null?0:Math.max(p>0?1.2:0,Math.min(100,p));
+    const fill = opts.hatch
+      ? `background:repeating-linear-gradient(45deg,${color},${color} 5px,transparent 5px,transparent 11px);opacity:.55`
+      : `background:${color}`;
+    const val = opts.text!=null ? opts.text : (p==null?"—":p.toFixed(1)+"%");
+    return `<div class="lossrow">
+      <div class="losslbl">${esc(label)}</div>
+      <div class="losstrack"${opts.title?` title="${esc(opts.title)}"`:""}><div class="lossfill" style="width:${w}%;${fill}"></div></div>
+      <div class="lossval ${opts.muted?'muted':''}">${val}</div></div>`; };
+  const availTitle=[o.unsched?`unscheduled ${fmtDur(o.unsched)}`:"", o.outage?`no-schedule outage ${fmtDur(o.outage)}`:""].filter(Boolean).join(" · ");
+  box.innerHTML=`
+    <div class="oee-head">Availability ${availPct==null?"—":"<b>"+availPct+"%</b>"} <span class="muted">· planned production that was actually up · past ${rangeName}</span></div>
+    <div class="oee-wf" title="the whole range = 100%">
+      <div class="wf-seg" style="width:${gp}%;background:var(--up)"></div>
+      <div class="wf-seg" style="width:${ap}%;background:var(--unsched)"></div>
+      <div class="wf-seg" style="width:${sp}%;background:var(--off)"></div>
+    </div>
+    <div class="oee-cap">
+      <span><i style="background:var(--up)"></i>productive (best case) ${gp.toFixed(1)}%</span>
+      <span><i style="background:var(--unsched)"></i>availability loss ${ap.toFixed(1)}%</span>
+      <span><i style="background:var(--off)"></i>schedule loss ${sp.toFixed(1)}%</span>
+    </div>
+    <div class="lossbars">
+      ${bar("Schedule loss", o.schedDefined?sp:null, "var(--off)", o.schedDefined?{title:"planned maintenance + off-hours from your manual schedule"}:{text:"not defined · assumed 24/7",muted:true})}
+      ${bar("Availability loss", ap, "var(--unsched)", {title:availTitle||"unplanned downtime"})}
+      ${bar("Performance loss", null, "var(--sched)", {hatch:true,text:"not measured",muted:true})}
+      ${bar("Quality loss", null, "#a78bfa", {hatch:true,text:"not measured",muted:true})}
+    </div>
+    <div class="oee-note muted"><b>Availability loss</b> is measured directly from status polling. <b>Schedule loss</b> comes from your manual schedule where one exists (else assumed 24/7). <b>Performance</b> &amp; <b>quality</b> loss need job-level data (shot timing, error rates) the status API doesn't expose — shown hatched, never estimated.</div>`;
 }
 
 /* collapsible panel: the SAME machine on every other provider route, for side-by-side comparison */
@@ -335,8 +429,11 @@ function autoload(force){
     document.getElementById("banner").innerHTML=`<div class="banner">Serve the folder (<code>python3 -m http.server</code>) to auto-load <code>data/uptime.json</code>, or use <b>Open JSON</b>.</div>`;
     return;
   }
-  fetch("data/uptime.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)
-    .then(j=>{ if(j) load(j);
+  Promise.all([
+    fetch("data/uptime.json",{cache:"no-store"}).then(r=>r.ok?r.json():null),
+    fetch("config/uptime_schedule.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)
+  ]).then(([j,s])=>{ if(s&&s.devices) SCHED=s.devices;
+      if(j) load(j);
       else document.getElementById("banner").innerHTML=`<div class="banner">No <code>data/uptime.json</code> yet — the poller needs to run at least once.</div>`; })
     .catch(()=>{});
 }
