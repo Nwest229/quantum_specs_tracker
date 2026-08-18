@@ -6,6 +6,7 @@
     "ibm": {
       "enabled": true,
       "emit_skips": true,
+      "instance": "crn:v1:bluemix:public:quantum-computing:us-east:a/0649c72b2be9486ba61b40d3e500bb5d:a8d5c529-b291-4322-a85b-2369c6298672::",
       "backends": [],
       "_note": "Set IBM_QUANTUM_TOKEN (or api_sources.ibm.token) + `pip install qiskit-ibm-runtime` for LIVE per-gate calibration: qubits, coupling-map edges, 1Q/2Q/SPAM fidelity stats, 1Q/2Q gate times, readout time, processor model, and Quantum Volume. Runs first, so its live values supersede the cited-const IBM entry and the CSV rows on merge. Optional 'backends' list restricts which devices are pulled (empty = all operational)."
     },
