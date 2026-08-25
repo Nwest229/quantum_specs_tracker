@@ -1,16 +1,16 @@
 {
-  "generated": "2026-08-25T23:03:04+00:00",
+  "generated": "2026-08-25T23:59:29+00:00",
   "window": {
     "from": "2026-08-07T11:00:28+00:00",
-    "to": "2026-08-25T23:03:03+00:00"
+    "to": "2026-08-25T23:59:29+00:00"
   },
   "devices": [
     {
       "device": "aws:aqt:qpu:ibex-q1",
       "current_status": "UNAVAILABLE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 14.71,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 14.679,
       "intervals": [
         {
           "device": "aws:aqt:qpu:ibex-q1",
@@ -125,8 +125,8 @@
         {
           "device": "aws:aqt:qpu:ibex-q1",
           "start": "2026-08-25T15:27:08+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 27355,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 30741,
           "statuses": [
             "UNAVAILABLE"
           ],
@@ -139,9 +139,9 @@
     {
       "device": "aws:ionq:qpu:forte-1",
       "current_status": "OFFLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 84.532,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 84.353,
       "intervals": [
         {
           "device": "aws:ionq:qpu:forte-1",
@@ -245,8 +245,8 @@
         {
           "device": "aws:ionq:qpu:forte-1",
           "start": "2026-08-24T13:37:19+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 120344,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 123730,
           "statuses": [
             "OFFLINE"
           ],
@@ -259,9 +259,9 @@
     {
       "device": "aws:ionq:qpu:forte-enterprise-1",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 85.831,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 85.861,
       "intervals": [
         {
           "device": "aws:ionq:qpu:forte-enterprise-1",
@@ -291,9 +291,9 @@
     {
       "device": "aws:iqm:qpu:emerald",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 56.275,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 56.368,
       "intervals": [
         {
           "device": "aws:iqm:qpu:emerald",
@@ -632,9 +632,9 @@
     {
       "device": "aws:iqm:qpu:garnet",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 57.818,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 57.907,
       "intervals": [
         {
           "device": "aws:iqm:qpu:garnet",
@@ -1215,9 +1215,9 @@
     {
       "device": "aws:quera:qpu:aquila",
       "current_status": "UNAVAILABLE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 52.391,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 52.28,
       "intervals": [
         {
           "device": "aws:quera:qpu:aquila",
@@ -1387,8 +1387,8 @@
         {
           "device": "aws:quera:qpu:aquila",
           "start": "2026-08-24T04:43:13+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 152390,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 155776,
           "statuses": [
             "UNAVAILABLE"
           ],
@@ -1401,9 +1401,9 @@
     {
       "device": "aws:rigetti:qpu:cepheus-1-108q",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 77.96,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 78.007,
       "intervals": [
         {
           "device": "aws:rigetti:qpu:cepheus-1-108q",
@@ -1796,15 +1796,15 @@
     {
       "device": "azure:ionq:qpu:forte-1",
       "current_status": "OFFLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 0.0,
       "intervals": [
         {
           "device": "azure:ionq:qpu:forte-1",
           "start": "2026-08-07T11:00:28+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 1598555,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 1601941,
           "statuses": [
             "OFFLINE"
           ],
@@ -1817,15 +1817,15 @@
     {
       "device": "azure:ionq:qpu:forte-enterprise-1",
       "current_status": "OFFLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 0.0,
       "intervals": [
         {
           "device": "azure:ionq:qpu:forte-enterprise-1",
           "start": "2026-08-07T11:00:28+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 1598555,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 1601941,
           "statuses": [
             "OFFLINE"
           ],
@@ -1838,15 +1838,15 @@
     {
       "device": "azure:pasqal:qpu:fresnel",
       "current_status": "OFFLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 0.0,
       "intervals": [
         {
           "device": "azure:pasqal:qpu:fresnel",
           "start": "2026-08-07T11:00:28+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 1598555,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 1601941,
           "statuses": [
             "OFFLINE"
           ],
@@ -1859,15 +1859,15 @@
     {
       "device": "azure:rigetti:qpu:cepheus-1-36q",
       "current_status": "OFFLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 0.0,
       "intervals": [
         {
           "device": "azure:rigetti:qpu:cepheus-1-36q",
           "start": "2026-08-07T11:00:28+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 1598555,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 1601941,
           "statuses": [
             "OFFLINE"
           ],
@@ -1880,8 +1880,8 @@
     {
       "device": "ibm:ibm:qpu:boston",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -1889,8 +1889,8 @@
     {
       "device": "ibm:ibm:qpu:fez",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -1898,9 +1898,9 @@
     {
       "device": "ibm:ibm:qpu:kingston",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 97.456,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 97.461,
       "intervals": [
         {
           "device": "ibm:ibm:qpu:kingston",
@@ -1952,9 +1952,9 @@
     {
       "device": "ibm:ibm:qpu:marrakesh",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 89.532,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 89.555,
       "intervals": [
         {
           "device": "ibm:ibm:qpu:marrakesh",
@@ -2083,8 +2083,8 @@
     {
       "device": "ibm:ibm:qpu:miami",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2092,9 +2092,9 @@
     {
       "device": "ibm:ibm:qpu:pittsburgh",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 89.137,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 89.16,
       "intervals": [
         {
           "device": "ibm:ibm:qpu:pittsburgh",
@@ -2157,9 +2157,9 @@
     {
       "device": "ionq:ionq:qpu:forte-1",
       "current_status": "UNAVAILABLE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
-      "uptime_pct": 80.242,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
+      "uptime_pct": 80.072,
       "intervals": [
         {
           "device": "ionq:ionq:qpu:forte-1",
@@ -2329,8 +2329,8 @@
         {
           "device": "ionq:ionq:qpu:forte-1",
           "start": "2026-08-24T13:37:19+00:00",
-          "end": "2026-08-25T23:03:03+00:00",
-          "duration_s": 120344,
+          "end": "2026-08-25T23:59:29+00:00",
+          "duration_s": 123730,
           "statuses": [
             "UNAVAILABLE"
           ],
@@ -2343,8 +2343,8 @@
     {
       "device": "openquantum:aqt:qpu:ibex-q1",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2352,8 +2352,8 @@
     {
       "device": "openquantum:ionq:qpu:forte-1",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2361,8 +2361,8 @@
     {
       "device": "openquantum:ionq:qpu:forte-enterprise",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2370,8 +2370,8 @@
     {
       "device": "openquantum:iqm:qpu:emerald",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2379,8 +2379,8 @@
     {
       "device": "openquantum:iqm:qpu:garnet",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2388,8 +2388,8 @@
     {
       "device": "openquantum:rigetti:qpu:cepheus-1-108q",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
@@ -2397,8 +2397,8 @@
     {
       "device": "rigetti:rigetti:qpu:cepheus-1-108q",
       "current_status": "ONLINE",
-      "last_seen": "2026-08-25T23:03:03+00:00",
-      "samples": 475,
+      "last_seen": "2026-08-25T23:59:29+00:00",
+      "samples": 476,
       "uptime_pct": 100.0,
       "intervals": [],
       "unscheduled": []
