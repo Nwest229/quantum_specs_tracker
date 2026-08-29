@@ -83,36 +83,36 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://arxiv.org/abs/2306.11727",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
         "field": "pricing.per_shot",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
         "field": "pricing.per_task",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
         "field": "pricing.comments",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:us-east-1::device/qpu/quera/Aquila"
     }
   },
@@ -150,8 +150,8 @@
       "2q_avg": "Not publicly disclosed",
       "2q_median": "Not publicly disclosed",
       "2q_min": "Not publicly disclosed",
-      "1q_max": 0.999631,
-      "1q_avg": 0.951354,
+      "1q_max": 0.999628,
+      "1q_avg": 0.951255,
       "1q_min": 0.5,
       "spam_avg": "Not publicly disclosed"
     },
@@ -200,36 +200,36 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "qpu_topology.edges",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_min",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q"
     }
   },
@@ -257,7 +257,7 @@
     "theoretical_max": {
       "value": 1.8014398509481984e+16,
       "source": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-      "retrieved": "2026-08-28T17:29:07+00:00",
+      "retrieved": "2026-08-29T11:41:51+00:00",
       "method": "theoretical",
       "kind": "computed"
     },
@@ -267,14 +267,14 @@
       "edges": 90
     },
     "fidelity": {
-      "2q_max": 0.998918,
-      "2q_avg": 0.99427,
+      "2q_max": 0.998843,
+      "2q_avg": 0.993643,
       "2q_median": "Not publicly disclosed",
-      "2q_min": 0.891095,
-      "1q_max": 0.999817,
-      "1q_avg": 0.999489,
-      "1q_min": 0.995818,
-      "spam_avg": 0.98658
+      "2q_min": 0.91111,
+      "1q_max": 0.99981,
+      "1q_avg": 0.999319,
+      "1q_min": 0.990428,
+      "spam_avg": 0.985747
     },
     "operation_speed": {
       "1q_gate_time_s": 4e-08,
@@ -313,9 +313,9 @@
         "formula": "2 ** min(N, 1/eps_2q); eps_2q = 1 - F_2q",
         "inputs": {
           "N": 54.0,
-          "F_2q": 0.99427,
+          "F_2q": 0.993643,
           "F_2q_stat": "average",
-          "eps_2q": 0.005730000000000013,
+          "eps_2q": 0.006356999999999946,
           "exponent": 54.0
         },
         "caveat": "Rough headroom proxy only: conflates circuit width (N) with depth (1/eps). Not a substitute for measured Quantum Volume."
@@ -325,78 +325,78 @@
       {
         "field": "theoretical_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_min",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_min",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.spam_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "pricing.per_shot",
         "url": "aws bracket",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_task",
         "url": "aws bracket",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_hour",
         "url": "aws bracket",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald"
     }
   },
@@ -424,7 +424,7 @@
     "theoretical_max": {
       "value": 805773331.3592639,
       "source": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-      "retrieved": "2026-08-28T17:29:07+00:00",
+      "retrieved": "2026-08-29T11:41:51+00:00",
       "method": "theoretical",
       "kind": "computed"
     },
@@ -492,60 +492,60 @@
       {
         "field": "theoretical_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.spam_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "operation_speed.1q_gate_time_s",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "operation_speed.2q_gate_time_s",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "operation_speed.readout_time_s",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1"
     }
   },
@@ -573,7 +573,7 @@
     "theoretical_max": {
       "value": 68719476736.0,
       "source": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-      "retrieved": "2026-08-28T17:29:07+00:00",
+      "retrieved": "2026-08-29T11:41:51+00:00",
       "method": "theoretical",
       "kind": "computed"
     },
@@ -584,13 +584,13 @@
     },
     "fidelity": {
       "2q_max": "Not publicly disclosed",
-      "2q_avg": 0.9882,
+      "2q_avg": 0.9913,
       "2q_median": "Not publicly disclosed",
       "2q_min": "Not publicly disclosed",
       "1q_max": "Not publicly disclosed",
       "1q_avg": 0.9998,
       "1q_min": "Not publicly disclosed",
-      "spam_avg": 0.994
+      "spam_avg": 0.9907
     },
     "operation_speed": {
       "1q_gate_time_s": 6.3e-05,
@@ -629,9 +629,9 @@
         "formula": "2 ** min(N, 1/eps_2q); eps_2q = 1 - F_2q",
         "inputs": {
           "N": 36.0,
-          "F_2q": 0.9882,
+          "F_2q": 0.9913,
           "F_2q_stat": "average",
-          "eps_2q": 0.011800000000000033,
+          "eps_2q": 0.008700000000000041,
           "exponent": 36.0
         },
         "caveat": "Rough headroom proxy only: conflates circuit width (N) with depth (1/eps). Not a substitute for measured Quantum Volume."
@@ -641,60 +641,60 @@
       {
         "field": "theoretical_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.spam_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "operation_speed.1q_gate_time_s",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "operation_speed.2q_gate_time_s",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "operation_speed.readout_time_s",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1"
     }
   },
@@ -726,7 +726,7 @@
     "theoretical_max": {
       "value": 1048576.0,
       "source": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-      "retrieved": "2026-08-28T17:29:07+00:00",
+      "retrieved": "2026-08-29T11:41:51+00:00",
       "method": "theoretical",
       "kind": "computed"
     },
@@ -736,14 +736,14 @@
       "edges": 31
     },
     "fidelity": {
-      "2q_max": 0.997894,
-      "2q_avg": 0.992965,
+      "2q_max": 0.997213,
+      "2q_avg": 0.991211,
       "2q_median": 0.9951,
-      "2q_min": 0.986475,
-      "1q_max": 0.999683,
-      "1q_avg": 0.998913,
-      "1q_min": 0.995529,
-      "spam_avg": 0.974235
+      "2q_min": 0.970896,
+      "1q_max": 0.999684,
+      "1q_avg": 0.999042,
+      "1q_min": 0.9967,
+      "spam_avg": 0.975757
     },
     "operation_speed": {
       "1q_gate_time_s": 4e-08,
@@ -782,9 +782,9 @@
         "formula": "2 ** min(N, 1/eps_2q); eps_2q = 1 - F_2q",
         "inputs": {
           "N": 20.0,
-          "F_2q": 0.992965,
+          "F_2q": 0.991211,
           "F_2q_stat": "average",
-          "eps_2q": 0.0070350000000000135,
+          "eps_2q": 0.008789000000000047,
           "exponent": 20.0
         },
         "caveat": "Rough headroom proxy only: conflates circuit width (N) with depth (1/eps). Not a substitute for measured Quantum Volume."
@@ -800,19 +800,19 @@
       {
         "field": "theoretical_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://arxiv.org/abs/2408.12433",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
@@ -824,49 +824,49 @@
       {
         "field": "fidelity.2q_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.2q_median",
         "url": "https://arxiv.org/abs/2408.12433",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
         "field": "fidelity.2q_min",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_max",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.1q_min",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "fidelity.spam_avg",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
@@ -878,7 +878,7 @@
       {
         "field": "operation_speed.2q_gate_time_s",
         "url": "https://arxiv.org/abs/2408.12433",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
@@ -890,30 +890,30 @@
       {
         "field": "pricing.per_shot",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
         "field": "pricing.per_task",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       },
       {
         "field": "pricing.per_hour",
         "url": "aws bracket",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "publication"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet"
     }
   },
@@ -1001,18 +1001,18 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "cloud-api"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "braket_arn": "arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1"
     }
   },
@@ -1115,7 +1115,7 @@
       {
         "field": "quantum_volume",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1133,13 +1133,13 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1163,13 +1163,13 @@
       {
         "field": "fidelity.2q_median",
         "url": "https://docs.quantinuum.com/systems/user_guide/hardware_user_guide/benchmarks/system_benchmarks.html",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_min",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1181,13 +1181,13 @@
       {
         "field": "fidelity.1q_avg",
         "url": "https://docs.quantinuum.com/systems/user_guide/hardware_user_guide/benchmarks/system_benchmarks.html",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.1q_min",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1217,7 +1217,7 @@
       {
         "field": "features.mid_circuit_measurement",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1235,7 +1235,7 @@
       {
         "field": "features.qubit_reuse",
         "url": "https://www.quantinuum.com/products-solutions/quantinuum-systems/system-model-h2",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1253,7 +1253,7 @@
       {
         "field": "pricing.per_iteration",
         "url": "https://www.quantinuum.com/glossary-item/hardware-quantum-credits-hqcs",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1271,12 +1271,12 @@
       {
         "field": "pricing.comments",
         "url": "https://www.quantinuum.com/glossary-item/hardware-quantum-credits-hqcs",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -1302,14 +1302,14 @@
     "vendor_metric": {
       "value": "36",
       "source": "https://ionq.com/quantum-systems/forte",
-      "retrieved": "2026-08-28T17:29:07+00:00",
+      "retrieved": "2026-08-29T11:41:51+00:00",
       "method": "benchmark-derived",
       "kind": "vendor"
     },
     "theoretical_max": {
       "value": 68719476736.0,
       "source": "https://ionq.com/quantum-systems/forte",
-      "retrieved": "2026-08-28T17:29:07+00:00",
+      "retrieved": "2026-08-29T11:41:51+00:00",
       "method": "theoretical",
       "kind": "computed"
     },
@@ -1377,31 +1377,31 @@
       {
         "field": "vendor_metric",
         "url": "https://ionq.com/quantum-systems/forte",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "theoretical_max",
         "url": "https://ionq.com/quantum-systems/forte",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://ionq.com/quantum-systems/forte",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://ionq.com/quantum-systems/forte",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "config-asserted"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://ionq.com/quantum-systems/forte",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1419,24 +1419,24 @@
       {
         "field": "pricing.per_shot",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_task",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:07+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -1530,48 +1530,48 @@
       {
         "field": "theoretical_max",
         "url": "https://quantum.cloud.ibm.com/docs/en/guides/processor-types",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.ibm.com/quantum/technology",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://www.ibm.com/quantum/technology",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_max",
         "url": "https://quantum.cloud.ibm.com/docs/en/guides/processor-types",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_median",
         "url": "https://quantum.cloud.ibm.com/docs/en/guides/processor-types",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_second",
         "url": "https://quantum.cloud.ibm.com/docs/en/guides/plans-overview",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://quantum.cloud.ibm.com/docs/en/guides/plans-overview",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -1672,13 +1672,13 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://blog.google/technology/research/google-willow-quantum-chip/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://blog.google/technology/research/google-willow-quantum-chip/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1696,13 +1696,13 @@
       {
         "field": "fidelity.2q_median",
         "url": "https://blog.google/technology/research/google-willow-quantum-chip/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://blog.google/technology/research/google-willow-quantum-chip/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
@@ -1719,7 +1719,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -1813,42 +1813,42 @@
       {
         "field": "theoretical_max",
         "url": "https://oqc.tech/company/newsroom/toshiko-the-worlds-first-enterprise-ready-quantum-platform/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://oqc.tech/company/newsroom/toshiko-the-worlds-first-enterprise-ready-quantum-platform/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://oqc.tech/company/newsroom/toshiko-the-worlds-first-enterprise-ready-quantum-platform/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_median",
         "url": "https://arxiv.org/abs/2601.20458",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://arxiv.org/abs/2601.20458",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.spam_avg",
         "url": "https://arxiv.org/abs/2601.20458",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -1942,54 +1942,54 @@
       {
         "field": "theoretical_max",
         "url": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_median",
         "url": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "operation_speed.2q_gate_time_s",
         "url": "https://www.rigetti.com/news/rigetti-computing-launches-84-qubit-ankaa-3-system-achieves-99-5-median-two-qubit-gate-fidelity-milestone",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_shot",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_task",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://aws.amazon.com/braket/pricing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2076,18 +2076,18 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.pasqal.com/wp-content/uploads/2025/03/Technical-Overview-for-Advanced-Users-Orion-Beta.pdf",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://www.pasqal.com/wp-content/uploads/2025/03/Technical-Overview-for-Advanced-Users-Orion-Beta.pdf",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2174,36 +2174,36 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.edges",
         "url": "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-announces-general-availability-of-advantage2-quantum-computer-its-most-advanced-and-performant-system/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_hour",
         "url": "https://venturebeat.com/business/d-wave-announces-leap-2-its-cloud-service-for-quantum-computing-applications",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.dwavequantum.com/solutions-and-products/cloud-platform/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2297,30 +2297,30 @@
       {
         "field": "theoretical_max",
         "url": "https://infleqtion.com/quantum-computing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://infleqtion.com/quantum-computing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://infleqtion.com/quantum-computing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://infleqtion.com/quantum-computing/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2414,48 +2414,48 @@
       {
         "field": "theoretical_max",
         "url": "https://quantware.com/news/generation-d-quantum-processors",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "computed"
       },
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.quantware.com/product/contralto",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://www.quantware.com/product/contralto",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.2q_avg",
         "url": "https://quantware.com/news/generation-d-quantum-processors",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.1q_avg",
         "url": "https://quantware.com/news/generation-d-quantum-processors",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "fidelity.spam_avg",
         "url": "https://quantware.com/news/generation-d-quantum-processors",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.per_system",
         "url": "https://www.quantware.com/product/contralto",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2545,18 +2545,18 @@
       {
         "field": "vendor_metric",
         "url": "https://alice-bob.com/newsroom/alice-bob-surpasses-bit-flip-stability-record/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "qpu_topology.type",
         "url": "https://alice-bob.com/newsroom/alice-bob-quantum-computing-roadmap/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2643,12 +2643,12 @@
       {
         "field": "qpu_topology.type",
         "url": "https://entangledfuture.com/company/neqxt/",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "third-party"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00"
+      "generated": "2026-08-29T11:41:51+00:00"
     }
   },
   {
@@ -2795,18 +2795,18 @@
       {
         "field": "pricing.per_hour",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 1e+35,
       "csv_theo_max_log2": 116.267,
       "csv_id": "40",
@@ -2908,7 +2908,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "43",
       "tier": "csv-baseline"
     }
@@ -3066,7 +3066,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 3e+17,
       "csv_theo_max_log2": 58.058,
@@ -3261,7 +3261,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 9000000000000000.0,
       "csv_theo_max_log2": 52.999,
       "csv_id": "13",
@@ -3363,7 +3363,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 70000000000.0,
       "csv_theo_max_log2": 36.027,
       "csv_id": "60",
@@ -3523,7 +3523,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100000000.0,
       "csv_theo_max_log2": 26.575,
@@ -3684,7 +3684,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100000000.0,
       "csv_theo_max_log2": 26.575,
@@ -3845,7 +3845,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100000000.0,
       "csv_theo_max_log2": 26.575,
@@ -4006,7 +4006,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100000000.0,
       "csv_theo_max_log2": 26.575,
@@ -4137,7 +4137,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 30000000.0,
       "csv_theo_max_log2": 24.838,
       "csv_id": "45",
@@ -4263,7 +4263,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 20000000.0,
       "csv_theo_max_log2": 24.253,
       "csv_id": "66",
@@ -4391,7 +4391,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 20000000.0,
       "csv_theo_max_log2": 24.253,
       "csv_id": "67",
@@ -4551,7 +4551,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 3000000.0,
       "csv_theo_max_log2": 21.517,
@@ -4712,7 +4712,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 1000000.0,
       "csv_theo_max_log2": 19.932,
@@ -4965,7 +4965,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 1000000.0,
       "csv_theo_max_log2": 19.932,
       "csv_id": "56",
@@ -5125,7 +5125,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 700000.0,
       "csv_theo_max_log2": 19.417,
@@ -5286,7 +5286,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 70000.0,
       "csv_theo_max_log2": 16.095,
@@ -5447,7 +5447,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "< 2",
       "csv_theo_max": 7000.0,
       "csv_theo_max_log2": 12.773,
@@ -5608,7 +5608,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "512 *",
       "csv_theo_max": 4000.0,
       "csv_theo_max_log2": 11.966,
@@ -5769,7 +5769,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 3000.0,
       "csv_theo_max_log2": 11.551,
@@ -5930,7 +5930,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "< 2",
       "csv_theo_max": 2000.0,
       "csv_theo_max_log2": 10.966,
@@ -6125,7 +6125,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 2000.0,
       "csv_theo_max_log2": 10.966,
@@ -6266,7 +6266,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 500.0,
       "csv_theo_max_log2": 8.966,
       "csv_id": "52",
@@ -6416,7 +6416,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "< 2",
       "csv_theo_max": 300.0,
       "csv_theo_max_log2": 8.229,
@@ -6577,7 +6577,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100.0,
       "csv_theo_max_log2": 6.644,
@@ -6738,7 +6738,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100.0,
       "csv_theo_max_log2": 6.644,
@@ -6899,7 +6899,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100.0,
       "csv_theo_max_log2": 6.644,
@@ -7060,7 +7060,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 100.0,
       "csv_theo_max_log2": 6.644,
@@ -7227,7 +7227,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 30.0,
       "csv_theo_max_log2": 4.907,
@@ -7388,7 +7388,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 30.0,
       "csv_theo_max_log2": 4.907,
@@ -7549,7 +7549,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 30.0,
       "csv_theo_max_log2": 4.907,
@@ -7710,7 +7710,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "2E+01",
       "csv_theo_max": 30.0,
       "csv_theo_max_log2": 4.907,
@@ -7871,7 +7871,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_black_box_benchmark": "8E+00",
       "csv_theo_max": 30.0,
       "csv_theo_max_log2": 4.907,
@@ -8000,7 +8000,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 4.0,
       "csv_theo_max_log2": 2.0,
       "csv_id": "65",
@@ -8122,7 +8122,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 4.0,
       "csv_theo_max_log2": 2.0,
       "csv_id": "69",
@@ -8213,7 +8213,7 @@
     },
     "sources": [],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "34",
@@ -8304,7 +8304,7 @@
     },
     "sources": [],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "47",
@@ -8412,7 +8412,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "48",
@@ -8508,7 +8508,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "51",
@@ -8604,7 +8604,7 @@
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "61",
@@ -8695,12 +8695,12 @@
       {
         "field": "qpu_topology.qubits",
         "url": "https://www.linkedin.com/posts/qudora_quantumcomputing-trappedions-quantumtechnology-ugcPost-7335963491381530624-7eOz?utm_source=share&utm_medium=member_desktop&rcm=ACoAABXxc-cB6W_-crNGcjaRrFG3vTvvMJPi-BE",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "third-party"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "63",
@@ -8789,7 +8789,7 @@
     },
     "sources": [],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "64",
@@ -8878,7 +8878,7 @@
     },
     "sources": [],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_theo_max": 2.0,
       "csv_theo_max_log2": 1.0,
       "csv_id": "68",
@@ -8971,18 +8971,18 @@
       {
         "field": "pricing.per_hour",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "35",
       "tier": "csv-baseline"
     }
@@ -9073,18 +9073,18 @@
       {
         "field": "pricing.per_hour",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "36",
       "tier": "csv-baseline"
     }
@@ -9175,18 +9175,18 @@
       {
         "field": "pricing.per_hour",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "37",
       "tier": "csv-baseline"
     }
@@ -9275,18 +9275,18 @@
       {
         "field": "pricing.per_hour",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "38",
       "tier": "csv-baseline"
     }
@@ -9377,18 +9377,18 @@
       {
         "field": "pricing.per_hour",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       },
       {
         "field": "pricing.comments",
         "url": "https://www.ibm.com/quantum/pricing#compare-features",
-        "retrieved": "2026-08-28T17:29:08+00:00",
+        "retrieved": "2026-08-29T11:41:51+00:00",
         "kind": "vendor"
       }
     ],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "39",
       "tier": "csv-baseline"
     }
@@ -9475,7 +9475,7 @@
     },
     "sources": [],
     "_meta": {
-      "generated": "2026-08-28T17:29:08+00:00",
+      "generated": "2026-08-29T11:41:51+00:00",
       "csv_id": "70",
       "tier": "csv-baseline"
     }
