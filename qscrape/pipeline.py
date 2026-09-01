@@ -32,6 +32,79 @@ def _is_skip(rec: BackendRecord) -> bool:
     return rec.meta.get("skipped") or rec.backend_name.startswith("__")
 
 
+# --- change-log -------------------------------------------------------------
+# Each run rebuilds backends.json from scratch, so the only way to see *what
+# actually changed* (a fidelity ticked up, a price appeared) is to diff the new
+# array against the previous one. We ignore provenance/derived noise — only real
+# spec values count as a change. Event-based history is provenance-clean, unlike
+# a fabricated time-series.
+_DIFF_SKIP_TOP = {"sources", "_meta", "derived_metrics", "theoretical_max", "id"}
+# provenance leaves carried inline on some fields — a retrieved/source/kind change
+# is not a spec change, so never log it
+_DIFF_SKIP_LEAF = (".retrieved", ".source", ".kind")
+
+
+def _flatten(o: Any, prefix: str = "") -> dict:
+    out: dict = {}
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if not prefix and k in _DIFF_SKIP_TOP:
+                continue
+            out.update(_flatten(v, f"{prefix}.{k}" if prefix else k))
+    elif isinstance(o, list):
+        out[prefix] = json.dumps(o, sort_keys=True, ensure_ascii=False)
+    else:
+        out[prefix] = o
+    return out
+
+
+def diff_docs(old_docs: list[dict], new_docs: list[dict]) -> tuple[list, list, list]:
+    """(changed, added, removed) between two backends.json arrays, keyed by id."""
+    def index(docs):
+        return {(d.get("id") or d.get("backend_name")): d for d in docs}
+
+    oi, ni = index(old_docs), index(new_docs)
+    changed = []
+    for key, nd in ni.items():
+        if key not in oi:
+            continue
+        of, nf = _flatten(oi[key]), _flatten(nd)
+        for f in sorted(set(of) | set(nf)):
+            if f.endswith(_DIFF_SKIP_LEAF):
+                continue
+            ov, nv = of.get(f), nf.get(f)
+            if ov != nv:
+                changed.append({"backend": nd.get("backend_name"), "id": key,
+                                "field": f, "from": ov, "to": nv})
+    added = [{"id": k, "backend": ni[k].get("backend_name")} for k in ni if k not in oi]
+    removed = [{"id": k, "backend": oi[k].get("backend_name")} for k in oi if k not in ni]
+    return changed, added, removed
+
+
+def append_changelog(old_docs, new_docs, generated: str, path: str) -> int:
+    """Append one run-entry to the change-log iff something changed. Best-effort:
+    never raises, so it can't break a pipeline run. Returns #changes logged."""
+    try:
+        changed, added, removed = diff_docs(old_docs, new_docs)
+        if not (changed or added or removed):
+            return 0
+        log = []
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as fh:
+                log = json.load(fh)
+        log.append({"generated": generated, "changed": changed,
+                    "added": added, "removed": removed})
+        log = log[-500:]  # bound growth
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as fh:
+            json.dump(log, fh, indent=2, ensure_ascii=False)
+            fh.write("\n")
+        os.replace(tmp, path)
+        return len(changed) + len(added) + len(removed)
+    except Exception:  # pragma: no cover - change-log is never load-bearing
+        return 0
+
+
 class Pipeline:
     def __init__(self, config: dict, http: HttpCache | None = None):
         self.config = config
@@ -140,11 +213,25 @@ class Pipeline:
     # -- output -----------------------------------------------------------
     def write(self, docs: list[dict], out_path: str) -> None:
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        # diff against the previous array before we overwrite it
+        old_docs = []
+        if os.path.exists(out_path):
+            try:
+                with open(out_path, encoding="utf-8") as fh:
+                    old_docs = json.load(fh)
+            except Exception:
+                old_docs = []
         tmp = out_path + ".tmp"
         with open(tmp, "w", encoding="utf-8") as fh:
             json.dump(docs, fh, indent=2, ensure_ascii=False)
             fh.write("\n")
         os.replace(tmp, out_path)
+        # append real spec changes to the change-log (best-effort, never fatal)
+        generated = (docs[0].get("_meta", {}).get("generated") if docs else None) or now_iso()
+        changelog_path = os.path.join(os.path.dirname(out_path), "changelog.json")
+        n = append_changelog(old_docs, docs, generated, changelog_path)
+        if n:
+            self.report.setdefault("warnings", []).append(f"change-log: {n} change(s) recorded")
         report_path = os.path.join(os.path.dirname(out_path), "run_report.json")
         with open(report_path, "w", encoding="utf-8") as fh:
             json.dump(self.report, fh, indent=2)

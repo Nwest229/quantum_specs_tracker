@@ -1,0 +1,882 @@
+[
+  {
+    "generated": "2026-07-15T10:43:32+02:00",
+    "changed": [
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.1q_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.993182
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.1q_max",
+        "from": "Not publicly disclosed",
+        "to": 0.999859
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.1q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.0
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.956581
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_max",
+        "from": 0.9986,
+        "to": 0.998619
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_median",
+        "from": "Not publicly disclosed",
+        "to": 0.997049
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.0
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.spam_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.979789
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "model",
+        "from": "Heron r2",
+        "to": "Heron 2"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "operation_speed.1q_gate_time_s",
+        "from": 2.5e-08,
+        "to": 2.4e-08
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "operation_speed.2q_gate_time_s",
+        "from": "Not publicly disclosed",
+        "to": 6.8e-08
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "operation_speed.readout_time_s",
+        "from": "Not publicly disclosed",
+        "to": 1.7e-06
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "qpu_topology.edges",
+        "from": "Not publicly disclosed",
+        "to": 176
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "qpu_topology.type",
+        "from": "Heron r2",
+        "to": "heavy-hex"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.1q_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.973927
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.1q_max",
+        "from": "Not publicly disclosed",
+        "to": 0.999914
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.1q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.0
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.945918
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_max",
+        "from": 0.9987999999999999,
+        "to": 0.999066
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_median",
+        "from": "Not publicly disclosed",
+        "to": 0.997344
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.0
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.spam_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.969225
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "model",
+        "from": "Heron r2",
+        "to": "Heron 2"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "operation_speed.1q_gate_time_s",
+        "from": 2.5e-08,
+        "to": 3.6e-08
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "operation_speed.2q_gate_time_s",
+        "from": "Not publicly disclosed",
+        "to": 6.8e-08
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "operation_speed.readout_time_s",
+        "from": "Not publicly disclosed",
+        "to": 2.18e-06
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "qpu_topology.edges",
+        "from": "Not publicly disclosed",
+        "to": 176
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "qpu_topology.type",
+        "from": "Heron r2",
+        "to": "heavy-hex"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.1q_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.973714
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.1q_max",
+        "from": "Not publicly disclosed",
+        "to": 0.999929
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.1q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.0
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.963457
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_max",
+        "from": 0.9991,
+        "to": 0.999201
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_median",
+        "from": "Not publicly disclosed",
+        "to": 0.99817
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.0
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.spam_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.982959
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "model",
+        "from": "Heron r2",
+        "to": "Heron 2"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "operation_speed.1q_gate_time_s",
+        "from": 2.5e-08,
+        "to": 3.2e-08
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "operation_speed.2q_gate_time_s",
+        "from": "Not publicly disclosed",
+        "to": 6.8e-08
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "operation_speed.readout_time_s",
+        "from": "Not publicly disclosed",
+        "to": 2.18e-06
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "qpu_topology.edges",
+        "from": "Not publicly disclosed",
+        "to": 176
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "qpu_topology.type",
+        "from": "Heron r2",
+        "to": "heavy-hex"
+      }
+    ],
+    "added": [],
+    "removed": []
+  },
+  {
+    "generated": "2026-07-20T11:08:17+02:00",
+    "changed": [
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_avg",
+        "from": 0.9990000000000001,
+        "to": 0.999566
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_max",
+        "from": 0.9990000000000001,
+        "to": 0.999829
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_min",
+        "from": 0.997,
+        "to": 0.997652
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_avg",
+        "from": 0.995,
+        "to": 0.994589
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_max",
+        "from": 0.992,
+        "to": 0.998563
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_min",
+        "from": 0.99,
+        "to": 0.942691
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.spam_avg",
+        "from": 0.97,
+        "to": 0.985136
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_avg",
+        "from": 0.9992,
+        "to": 0.998615
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_max",
+        "from": 0.9994,
+        "to": 0.999575
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.993158
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_avg",
+        "from": 0.995,
+        "to": 0.99017
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_max",
+        "from": 0.998,
+        "to": 0.996259
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_min",
+        "from": "Not publicly disclosed",
+        "to": 0.962525
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.spam_avg",
+        "from": "Not publicly disclosed",
+        "to": 0.9625
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.1q_avg",
+        "from": 0.973714,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.1q_max",
+        "from": 0.999929,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.1q_min",
+        "from": 0.0,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_avg",
+        "from": 0.963457,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_max",
+        "from": 0.999201,
+        "to": 0.9991
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_median",
+        "from": 0.99817,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.2q_min",
+        "from": 0.0,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "fidelity.spam_avg",
+        "from": 0.982959,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "model",
+        "from": "Heron 2",
+        "to": "Heron r2"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "operation_speed.1q_gate_time_s",
+        "from": 3.2e-08,
+        "to": 2.5e-08
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "operation_speed.2q_gate_time_s",
+        "from": 6.8e-08,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "operation_speed.readout_time_s",
+        "from": 2.18e-06,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "qpu_topology.edges",
+        "from": 176,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Kingston",
+        "id": "35",
+        "field": "qpu_topology.type",
+        "from": "heavy-hex",
+        "to": "Heron r2"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.1q_avg",
+        "from": 0.993182,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.1q_max",
+        "from": 0.999859,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.1q_min",
+        "from": 0.0,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_avg",
+        "from": 0.956581,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_max",
+        "from": 0.998619,
+        "to": 0.9986
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_median",
+        "from": 0.997049,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.2q_min",
+        "from": 0.0,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "fidelity.spam_avg",
+        "from": 0.979789,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "model",
+        "from": "Heron 2",
+        "to": "Heron r2"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "operation_speed.1q_gate_time_s",
+        "from": 2.4e-08,
+        "to": 2.5e-08
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "operation_speed.2q_gate_time_s",
+        "from": 6.8e-08,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "operation_speed.readout_time_s",
+        "from": 1.7e-06,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "qpu_topology.edges",
+        "from": 176,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Fez",
+        "id": "36",
+        "field": "qpu_topology.type",
+        "from": "heavy-hex",
+        "to": "Heron r2"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.1q_avg",
+        "from": 0.973927,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.1q_max",
+        "from": 0.999914,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.1q_min",
+        "from": 0.0,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_avg",
+        "from": 0.945918,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_max",
+        "from": 0.999066,
+        "to": 0.9987999999999999
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_median",
+        "from": 0.997344,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.2q_min",
+        "from": 0.0,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "fidelity.spam_avg",
+        "from": 0.969225,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "model",
+        "from": "Heron 2",
+        "to": "Heron r2"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "operation_speed.1q_gate_time_s",
+        "from": 3.6e-08,
+        "to": 2.5e-08
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "operation_speed.2q_gate_time_s",
+        "from": 6.8e-08,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "operation_speed.readout_time_s",
+        "from": 2.18e-06,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "qpu_topology.edges",
+        "from": 176,
+        "to": "Not publicly disclosed"
+      },
+      {
+        "backend": "IBM Marrakesh",
+        "id": "37",
+        "field": "qpu_topology.type",
+        "from": "heavy-hex",
+        "to": "Heron r2"
+      }
+    ],
+    "added": [
+      {
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "backend": "Rigetti Cepheus-1-108Q"
+      },
+      {
+        "id": "ionq-ionq-forte-1",
+        "backend": "IonQ Forte 1"
+      },
+      {
+        "id": "ionq-ionq-forte-enterprise-1",
+        "backend": "IonQ Forte Enterprise 1"
+      },
+      {
+        "id": "aqt-aqt-ibex-q1",
+        "backend": "AQT IBEX Q1"
+      }
+    ],
+    "removed": [
+      {
+        "id": "59",
+        "backend": "QCWare Forge avg. system"
+      },
+      {
+        "id": "62",
+        "backend": "QC Ware Forge NVIDIA GPU"
+      }
+    ]
+  },
+  {
+    "generated": "2026-08-18T07:19:35Z",
+    "changed": [
+      {
+        "backend": "Rigetti Cepheus-1-108Q",
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "field": "fidelity.1q_avg",
+        "from": 0.978826,
+        "to": 0.969831
+      },
+      {
+        "backend": "Rigetti Cepheus-1-108Q",
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "field": "fidelity.1q_max",
+        "from": 0.999503,
+        "to": 0.999537
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_avg",
+        "from": 0.999566,
+        "to": 0.99952
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_max",
+        "from": 0.999829,
+        "to": 0.999801
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_min",
+        "from": 0.997652,
+        "to": 0.996803
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_avg",
+        "from": 0.994589,
+        "to": 0.99397
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_max",
+        "from": 0.998563,
+        "to": 0.998497
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_min",
+        "from": 0.942691,
+        "to": 0.923947
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.spam_avg",
+        "from": 0.985136,
+        "to": 0.987951
+      },
+      {
+        "backend": "IonQ Forte 1",
+        "id": "ionq-ionq-forte-1",
+        "field": "fidelity.2q_avg",
+        "from": 0.9941,
+        "to": 0.9836
+      },
+      {
+        "backend": "IonQ Forte 1",
+        "id": "ionq-ionq-forte-1",
+        "field": "fidelity.spam_avg",
+        "from": 0.9962,
+        "to": 0.9959
+      },
+      {
+        "backend": "IonQ Forte Enterprise 1",
+        "id": "ionq-ionq-forte-enterprise-1",
+        "field": "fidelity.1q_avg",
+        "from": 0.999,
+        "to": 0.9998
+      },
+      {
+        "backend": "IonQ Forte Enterprise 1",
+        "id": "ionq-ionq-forte-enterprise-1",
+        "field": "fidelity.2q_avg",
+        "from": 0.9834,
+        "to": 0.9921
+      },
+      {
+        "backend": "IonQ Forte Enterprise 1",
+        "id": "ionq-ionq-forte-enterprise-1",
+        "field": "fidelity.spam_avg",
+        "from": 0.9962,
+        "to": 0.996
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_avg",
+        "from": 0.998615,
+        "to": 0.999042
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_max",
+        "from": 0.999575,
+        "to": 0.999605
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_min",
+        "from": 0.993158,
+        "to": 0.99518
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_avg",
+        "from": 0.99017,
+        "to": 0.991016
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_max",
+        "from": 0.996259,
+        "to": 0.996956
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_min",
+        "from": 0.962525,
+        "to": 0.975785
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.spam_avg",
+        "from": 0.9625,
+        "to": 0.974278
+      }
+    ],
+    "added": [],
+    "removed": []
+  }
+]

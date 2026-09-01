@@ -81,6 +81,28 @@
   a.navlink { background:var(--chip); color:var(--fg); border:1px solid var(--line); padding:7px 12px;
     border-radius:8px; font-size:13px; text-decoration:none; }
   a.navlink:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* leaderboard */
+  #view-leaderboard .lbrow { display:grid; grid-template-columns:32px minmax(150px,1.3fr) 2fr auto;
+    align-items:center; gap:12px; padding:6px 0; border-bottom:1px solid var(--line); }
+  #view-leaderboard .lbrank { color:var(--muted); text-align:right; font-size:13px; font-variant-numeric:tabular-nums; }
+  #view-leaderboard .lbname { font-size:13.5px; }
+  #view-leaderboard .lbmod { font-size:11px; margin-left:6px; }
+  #view-leaderboard .lbtrack { height:16px; background:var(--chip); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  #view-leaderboard .lbfill { height:100%; border-radius:8px 0 0 8px; }
+  #view-leaderboard .lbval { font-size:13px; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* changelog */
+  #view-changelog .clcard { border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:14px; }
+  #view-changelog .clhead { font-size:13px; color:var(--muted); margin-bottom:9px; padding-bottom:7px; border-bottom:1px solid var(--line); }
+  #view-changelog .clrow { font-size:12.5px; padding:3px 0; display:flex; gap:7px; align-items:baseline; flex-wrap:wrap; }
+  #view-changelog .clfield { color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:11.5px; }
+  #view-changelog .clval { font-variant-numeric:tabular-nums; }
+  #view-changelog .clval.up, #view-changelog .clarrow.up { color:var(--ok,#3fb68b); }
+  #view-changelog .clval.down, #view-changelog .clarrow.down { color:var(--warn,#e06c75); }
+  #view-changelog .cladd { color:#3fb68b; } #view-changelog .clrem { color:#e06c75; }
+  /* stale-source flag */
+  a.src.stale { border-style:dashed; opacity:.6; }
 </style>
 </head>
 <body>
@@ -93,6 +115,8 @@
     <div class="tabs">
       <button id="tab-table" class="active">Table</button>
       <button id="tab-charts">Charts</button>
+      <button id="tab-leaderboard">Leaderboard 🏆</button>
+      <button id="tab-changelog">Changelog 📋</button>
     </div>
     <input type="search" id="q" placeholder="filter vendor / backend…">
     <label class="file">Open JSON<input type="file" id="file" accept="application/json,.json"></label>
@@ -149,18 +173,64 @@
   </div>
 </div>
 
+<!-- LEADERBOARD VIEW -->
+<div class="wrap hidden" id="view-leaderboard">
+  <div class="chartbar">
+    <span class="lbl">Modality</span>
+    <select id="lbMod">
+      <option value="Trapped-ion" selected>Trapped-ion</option>
+      <option value="Superconducting">Superconducting</option>
+      <option value="Neutral-atom">Neutral-atom</option>
+      <option value="Annealer">Annealer</option>
+      <option value="All">All modalities</option>
+    </select>
+    <span class="lbl">Rank by</span>
+    <select id="lbMetric">
+      <option value="2q_avg" selected>2Q avg fidelity</option>
+      <option value="2q_max">2Q max fidelity</option>
+      <option value="1q_avg">1Q avg fidelity</option>
+      <option value="spam">SPAM avg fidelity</option>
+      <option value="qubits">Qubits</option>
+      <option value="qv">Quantum Volume</option>
+      <option value="2q_t">2Q gate time (speed)</option>
+    </select>
+  </div>
+  <div class="card">
+    <h3 id="lbTitle">Leaderboard</h3>
+    <p class="note" id="lbNote"></p>
+    <div id="lbchart"></div>
+  </div>
+</div>
+
+<!-- CHANGELOG VIEW -->
+<div class="wrap hidden" id="view-changelog">
+  <div class="card">
+    <h3>Change history</h3>
+    <p class="note">What actually changed between scrape runs — real spec drift (fidelity, pricing, qubits), captured by diffing each run's <code>backends.json</code>. Green = value rose, red = fell.</p>
+    <div id="clchart"></div>
+  </div>
+</div>
+
 <div class="tip" id="tip"></div>
 
 <script>
 const UNKNOWN = "Not publicly disclosed";
 let DATA = [], sortCol = 0, sortAsc = true;
+let CHANGELOG = [];
+// Freshness only means something for values that DRIFT — live API calibration.
+// A publication or vendor page being old isn't "stale data" (its number won't
+// change), so we only dash-flag live sources that haven't refreshed recently.
+const STALE_DAYS = 30;
+const LIVE_KINDS = new Set(["cloud-api","calibration-api"]);
 
 /* ---------- column model: {key,label,group,kind,get} ---------- */
 const G = {id:"Identity", head:"Headline", topo:"Topology", fid:"Fidelity",
            speed:"Speed", feat:"Features", price:"Pricing", prov:"Provenance"};
 function leaf(b,grp,k){ const g=b[grp]||{}; const v=g[k];
-  const s=(b.sources||[]).find(x=>x.field===`${grp}.${k}`); return {value:v, source:s&&s.url, skind:s&&s.kind}; }
-function prov(b,name){ const v=b[name]; if(v&&typeof v==="object") return {value:v.value, source:v.source, skind:v.kind}; return {value:v}; }
+  const s=(b.sources||[]).find(x=>x.field===`${grp}.${k}`); return {value:v, source:s&&s.url, skind:s&&s.kind, retrieved:s&&s.retrieved}; }
+function prov(b,name){ const v=b[name]; const s=(b.sources||[]).find(x=>x.field===name);
+  if(v&&typeof v==="object") return {value:v.value, source:v.source||(s&&s.url), skind:v.kind||(s&&s.kind), retrieved:v.retrieved||(s&&s.retrieved)};
+  return {value:v, source:s&&s.url, skind:s&&s.kind, retrieved:s&&s.retrieved}; }
 function scalar(v){ return {value:v}; }
 function techSrc(b){ const s=(b.sources||[]).find(x=>x.field&&x.field.indexOf("pricing.")!==0); return s||{}; }
 function priceSrc(b){ const s=(b.sources||[]).find(x=>x.field&&x.field.indexOf("pricing.")===0); return s||{}; }
@@ -238,7 +308,7 @@ function fmtCell(cell, kind){
   else if (kind==="num" && typeof v==="number") text=v.toLocaleString();
   else if (kind==="vendor") cls="vendor";
   else if (kind==="bool"){ const t=/^(yes|true|supported|available)/i.test(text); cls=t?"yes":"no"; }
-  const link = cell.source ? srcBadge(cell.source, cell.skind) : "";
+  const link = cell.source ? srcBadge(cell.source, cell.skind, cell.retrieved) : "";
   return `<span class="${cls}">${text}</span>${link}`;
 }
 // classify a source by how the value was obtained, and render a coloured badge
@@ -249,11 +319,14 @@ function srcCategory(skind, url){
   if(skind==="publication") return "pub";
   return "";
 }
-function srcBadge(url, skind){
+function srcBadge(url, skind, retrieved){
   const cat = srcCategory(skind, url);
   const label = {api:"api", pdf:"pdf", web:"web", pub:"pub"}[cat] || "src";
-  const cls = cat ? `src src-${cat}` : "src";
-  const tip = (skind||"source") + " · " + url;
+  let cls = cat ? `src src-${cat}` : "src", age = "";
+  if(retrieved){ const days=Math.floor((Date.now()-Date.parse(retrieved))/864e5);
+    if(isFinite(days)){ age = ` · retrieved ${String(retrieved).slice(0,10)} (${days}d ago)`;
+      if(days>STALE_DAYS && LIVE_KINDS.has(skind)){ cls += " stale"; age += " — live value not refreshed"; } } }
+  const tip = (skind||"source") + " · " + url + age;
   return ` <a class="${cls}" href="${url}" target="_blank" rel="noopener" title="${tip}">${label}</a>`;
 }
 function activeCols(){ return COLS.filter(c=>VISIBLE.has(c[2])); }
@@ -483,19 +556,110 @@ function wireTips(){
   });
 }
 
+/* ============================================================
+   LEADERBOARD — competitive lens: rank one modality by one metric.
+   Bars are scaled to the visible range so near-1.0 fidelities stay legible;
+   the printed number is always the true value, with its source badge.
+   ============================================================ */
+function modalityOf(b){ const t=String(b.type||"").toLowerCase();
+  if(t.indexOf("trapped-ion")>=0) return "Trapped-ion";
+  if(t.indexOf("neutral-atom")>=0) return "Neutral-atom";
+  if(t.indexOf("annealer")>=0) return "Annealer";
+  if(t.indexOf("superconducting")>=0) return "Superconducting";
+  return "Other"; }
+const MOD_COLOR={"Trapped-ion":"#6ea8fe","Superconducting":"#e0a34e",
+  "Neutral-atom":"#3fb68b","Annealer":"#a78bfa","Other":"#8b93a7"};
+const pctFmt=v=>(v*100).toFixed(3).replace(/0+$/,"").replace(/\.$/,"")+"%";
+const intFmt=v=>Math.round(v).toLocaleString();
+const secFmt=v=> v>=1e-3?(v*1e3).toFixed(2)+" ms":v>=1e-6?(v*1e6).toFixed(2)+" µs":(v*1e9).toFixed(1)+" ns";
+const LB_METRICS=[
+  {key:"2q_avg",label:"2Q avg fidelity", get:b=>leaf(b,"fidelity","2q_avg"), better:"high", fmt:pctFmt},
+  {key:"2q_max",label:"2Q max fidelity", get:b=>leaf(b,"fidelity","2q_max"), better:"high", fmt:pctFmt},
+  {key:"1q_avg",label:"1Q avg fidelity", get:b=>leaf(b,"fidelity","1q_avg"), better:"high", fmt:pctFmt},
+  {key:"spam", label:"SPAM avg fidelity",get:b=>leaf(b,"fidelity","spam_avg"),better:"high", fmt:pctFmt},
+  {key:"qubits",label:"Qubits",          get:b=>leaf(b,"qpu_topology","qubits"),better:"high",fmt:intFmt},
+  {key:"qv",    label:"Quantum Volume",   get:b=>prov(b,"quantum_volume"),      better:"high", fmt:intFmt},
+  {key:"2q_t",  label:"2Q gate time",     get:b=>leaf(b,"operation_speed","2q_gate_time_s"), better:"low", fmt:secFmt},
+];
+function renderLeaderboard(){
+  if(!DATA.length) return;
+  const mod=document.getElementById("lbMod").value;
+  const metric=LB_METRICS.find(m=>m.key===document.getElementById("lbMetric").value)||LB_METRICS[0];
+  const inScope=DATA.filter(b=> mod==="All" || modalityOf(b)===mod);
+  let rows=inScope.map(b=>{ const cell=metric.get(b), v=num(cell.value);
+      return v==null?null:{b, v, cell, mod:modalityOf(b)}; }).filter(Boolean);
+  const missing=inScope.length-rows.length;
+  rows.sort((a,z)=> metric.better==="low" ? a.v-z.v : z.v-a.v);
+  const vals=rows.map(r=>r.v), mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+  const norm=v=>{ if(mx===mn) return 1; let f=(v-mn)/(mx-mn); if(metric.better==="low") f=1-f; return 0.06+0.94*f; };
+  document.getElementById("lbTitle").textContent =
+    (mod==="All"?"All modalities":mod)+" · ranked by "+metric.label;
+  document.getElementById("lbchart").innerHTML = rows.length ? rows.map((r,i)=>{
+    const col=MOD_COLOR[r.mod]||"#8b93a7";
+    return `<div class="lbrow">
+      <div class="lbrank">${i+1}</div>
+      <div class="lbname">${esc(r.b.backend_name||r.b.id)}${mod==="All"?` <span class="lbmod" style="color:${col}">${esc(r.mod)}</span>`:""}</div>
+      <div class="lbtrack"><div class="lbfill" style="width:${(norm(r.v)*100).toFixed(1)}%;background:${col}"></div></div>
+      <div class="lbval">${metric.fmt(r.v)}${r.cell.source?srcBadge(r.cell.source,r.cell.skind):""}</div>
+    </div>`; }).join("")
+    : `<div class="unknown" style="padding:20px 0">No ${esc(mod)} machines publicly disclose <b>${esc(metric.label)}</b>.</div>`;
+  document.getElementById("lbNote").innerHTML =
+    `${metric.better==="low"?"Lower is better (faster).":"Higher is better."} `
+    +`${rows.length} machine${rows.length!==1?"s":""} shown`
+    +(missing>0?` · <b>${missing}</b> hidden (value not publicly disclosed)`:"")
+    +`. Bars are scaled to the visible range so differences are legible — the number is the real value, with its source.`;
+}
+
+/* ============================================================
+   CHANGELOG — real spec drift between runs (from data/changelog.json)
+   ============================================================ */
+function fmtCL(v, field){
+  if(v===null||v===undefined||v==="") return "—";
+  const n=Number(v);
+  if(isFinite(n) && /fidelity|spam/.test(field||"") && n>0 && n<1)
+    return (n*100).toFixed(3).replace(/0+$/,"").replace(/\.$/,"")+"%";
+  return String(v);
+}
+function renderChangelog(){
+  const box=document.getElementById("clchart");
+  if(!CHANGELOG.length){ box.innerHTML=`<div class="unknown" style="padding:20px 0">No change history yet — it fills in as the daily scrape detects changes.</div>`; return; }
+  box.innerHTML = CHANGELOG.slice().reverse().map(run=>{
+    const d=(run.generated||"").slice(0,10);
+    const nC=(run.changed||[]).length, nA=(run.added||[]).length, nR=(run.removed||[]).length;
+    const items=[];
+    (run.added||[]).forEach(a=>items.push(`<div class="clrow"><span class="cladd">＋ added</span> <b>${esc(a.backend||a.id)}</b></div>`));
+    (run.removed||[]).forEach(a=>items.push(`<div class="clrow"><span class="clrem">－ removed</span> <b>${esc(a.backend||a.id)}</b></div>`));
+    (run.changed||[]).forEach(c=>{
+      const fn=Number(c.from), tn=Number(c.to);
+      const numeric=isFinite(fn)&&isFinite(tn)&&c.from!==""&&c.from!=null&&c.to!==""&&c.to!=null;
+      const dir=numeric?(tn>fn?"up":tn<fn?"down":""):"";
+      items.push(`<div class="clrow"><b>${esc(c.backend||c.id)}</b> <span class="clfield">${esc(c.field)}</span> `
+        +`<span class="clval">${esc(fmtCL(c.from,c.field))}</span> <span class="clarrow ${dir}">→</span> `
+        +`<span class="clval ${dir}">${esc(fmtCL(c.to,c.field))}</span></div>`);
+    });
+    return `<div class="clcard"><div class="clhead">${esc(d)} · <b>${nC}</b> changed`
+      +`${nA?` · <span class="cladd">${nA} added</span>`:""}${nR?` · <span class="clrem">${nR} removed</span>`:""}</div>${items.join("")}</div>`;
+  }).join("");
+}
+
 /* ---------- view switching + loading ---------- */
 function showTab(which){
-  const t=which==="table";
-  document.getElementById("tab-table").classList.toggle("active",t);
-  document.getElementById("tab-charts").classList.toggle("active",!t);
-  document.getElementById("view-table").classList.toggle("hidden",!t);
-  document.getElementById("groups").classList.toggle("hidden",!t);
-  document.getElementById("view-charts").classList.toggle("hidden",t);
-  if(!t) renderChart();
+  const views={table:"view-table", charts:"view-charts", leaderboard:"view-leaderboard", changelog:"view-changelog"};
+  Object.keys(views).forEach(k=>{
+    document.getElementById("tab-"+k).classList.toggle("active",k===which);
+    document.getElementById(views[k]).classList.toggle("hidden",k!==which);
+  });
+  document.getElementById("groups").classList.toggle("hidden",which!=="table");
+  if(which==="charts") renderChart();
+  if(which==="leaderboard") renderLeaderboard();
+  if(which==="changelog") renderChangelog();
 }
 document.getElementById("tab-table").onclick=()=>showTab("table");
 document.getElementById("tab-charts").onclick=()=>showTab("charts");
+document.getElementById("tab-leaderboard").onclick=()=>showTab("leaderboard");
+document.getElementById("tab-changelog").onclick=()=>showTab("changelog");
 ["chartType","metric","spec","divisor","logy"].forEach(id=>document.getElementById(id).addEventListener("change",renderChart));
+["lbMod","lbMetric"].forEach(id=>document.getElementById(id).addEventListener("change",renderLeaderboard));
 document.getElementById("q").addEventListener("input",renderTable);
 
 function loadData(arr,name){
@@ -521,6 +685,7 @@ fillSelectors();
 (function auto(){
   if(location.protocol==="file:") return;
   fetch("data/backends.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(j) loadData(j,"data/backends.json"); }).catch(()=>{});
+  fetch("data/changelog.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(Array.isArray(j)) CHANGELOG=j; }).catch(()=>{});
 })();
 </script>
 </body>
