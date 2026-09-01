@@ -91,6 +91,16 @@
   .lossfill{height:100%;}
   .lossval{font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;}
   .oee-note{font-size:11.5px;margin-top:14px;line-height:1.55;}
+
+  /* native cross-check (qBraid vs provider API) */
+  .ccbox{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:12.5px;}
+  .ccbox.ok{border-color:var(--up);}
+  .ccbox.bad{border-color:var(--unsched);background:#2a1a1e;}
+  .ccbox .cctag{font-weight:650;}
+  .ccbox.ok .cctag{color:var(--up);}
+  .ccbox.bad .cctag{color:var(--unsched);}
+  .ccbox .ccpair b{color:var(--fg);}
+  .ccflag{color:var(--unsched);font-size:12px;margin-left:4px;}
 </style>
 </head>
 <body>
@@ -114,7 +124,7 @@
 <div class="tip" id="tip"></div>
 
 <script>
-let REPORT=null, SCHED={}, COMPANY=null, MACHINE=null, RANGE="week";
+let REPORT=null, SCHED={}, CROSSCHECK=null, COMPANY=null, MACHINE=null, RANGE="week";
 const RANGES={day:864e5, week:6048e5, month:2592e6};
 const RANGE_LABELS={day:"Day", week:"Week", month:"Month"};
 const CLS_COLOR={unscheduled:"var(--unsched)", scheduled:"var(--sched)", "off-hours":"var(--off)", outage:"#b5545e"};
@@ -229,12 +239,13 @@ function renderCompanies(g){
 
 /* step 2 — machines of a company (deduped across provider routes) */
 function renderMachines(g){
-  const mm=machinesOf(COMPANY,g);
+  const mm=machinesOf(COMPANY,g), dis=ccDisagreeSet();
   const cards=mm.map(m=>{
     const online=m.routes.filter(r=>r.current_status==="ONLINE").length, n=m.routes.length;
     const plats=m.routes.map(r=>platformLabel(parseDev(r.device).provider)).join(", ");
+    const flag=m.routes.some(r=>dis.has(r.device))?`<span class="ccflag" title="qBraid disagrees with the provider's own API">⚠</span>`:"";
     return `<button class="bigcard" data-m="${esc(m.rep.device)}">
-      <div class="bc-title">${esc(m.name)}</div>
+      <div class="bc-title">${esc(m.name)}${flag}</div>
       <div class="bc-sub">${n>1?n+" providers":"1 provider"} · ${esc(plats)}</div>
       <div class="bc-sub"><span class="dot" style="background:${online?'var(--up)':'var(--off)'}"></span>${online}/${n} online</div>
     </button>`;
@@ -244,6 +255,21 @@ function renderMachines(g){
      <h2>${esc(companyLabel(COMPANY))} · machines</h2><div class="grid">${cards}</div>`;
   document.getElementById("toCompanies").onclick=()=>{ COMPANY=null; MACHINE=null; render(); };
   document.querySelectorAll(".bigcard").forEach(b=> b.onclick=()=>{ MACHINE=b.dataset.m; render(); });
+}
+
+/* native cross-check: qBraid vs the provider's own API for this device */
+function ccFor(id){ return CROSSCHECK ? (CROSSCHECK.devices||[]).find(x=>x.device===id)||null : null; }
+function ccDisagreeSet(){ const s=new Set(); if(CROSSCHECK) (CROSSCHECK.devices||[]).forEach(x=>{ if(!x.agree) s.add(x.device); }); return s; }
+function ccSourceLabel(s){ return s==="aws-braket"?"AWS Braket":s==="ibm"?"IBM":s; }
+function ccHTML(id){
+  const cc=ccFor(id); if(!cc) return "";
+  const when = CROSSCHECK.generated ? "checked "+esc(CROSSCHECK.generated.slice(0,16))+" UTC" : "";
+  return `<div class="ccbox ${cc.agree?'ok':'bad'}">
+    <span class="cctag">${cc.agree?'✓ sources agree':'⚠ sources disagree'}</span>
+    <span class="ccpair">qBraid <b>${esc(cc.qbraid.status)}</b> vs ${esc(ccSourceLabel(cc.native.source))} <b>${esc(cc.native.status)}</b></span>
+    ${cc.native.msg?`<span class="muted">“${esc(cc.native.msg)}”</span>`:""}
+    <span class="muted" style="margin-left:auto">${when}</span>
+  </div>`;
 }
 
 /* step 3 — one machine's schedule */
@@ -263,6 +289,7 @@ function renderScheduleView(g){
         <span class="dot" style="background:${statusColor(d.current_status)}"></span> <span style="font-size:13px;font-weight:500">${esc(d.current_status)}</span></div>
       <div class="mmeta">uptime ${up==null?"—":"<b>"+up+"%</b>"} · past ${RANGE_LABELS[RANGE].toLowerCase()} · last seen ${esc((d.last_seen||"").slice(0,16))} UTC</div>
     </div>
+    ${ccHTML(d.device)}
     <div class="pickrow"><span class="picklbl">View</span><div class="btnrow">${rbtns}</div></div>
     <div class="legend">
       <span><i style="background:var(--up)"></i>online</span>
@@ -431,8 +458,9 @@ function autoload(force){
   }
   Promise.all([
     fetch("data/uptime.json",{cache:"no-store"}).then(r=>r.ok?r.json():null),
-    fetch("config/uptime_schedule.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)
-  ]).then(([j,s])=>{ if(s&&s.devices) SCHED=s.devices;
+    fetch("config/uptime_schedule.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null),
+    fetch("data/crosscheck.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)
+  ]).then(([j,s,c])=>{ if(s&&s.devices) SCHED=s.devices; if(c&&c.devices) CROSSCHECK=c;
       if(j) load(j);
       else document.getElementById("banner").innerHTML=`<div class="banner">No <code>data/uptime.json</code> yet — the poller needs to run at least once.</div>`; })
     .catch(()=>{});

@@ -160,6 +160,145 @@ def list_devices(cfg: dict, api_key: str) -> list[dict]:
     return _get_devices(cfg, api_key)
 
 
+# ---------------------------------------------------------------------------
+# 1b. NATIVE CROSS-CHECK: qBraid is an aggregator whose normalised status can
+#     lag the provider's own API. Poll AWS Braket + IBM directly and compare, so
+#     a "qBraid says ONLINE, AWS says OFFLINE" disagreement becomes visible.
+#     Everything here is best-effort: missing SDK/creds -> that source is skipped.
+# ---------------------------------------------------------------------------
+def _native_braket(known_ids: set) -> dict:
+    """{qbraid_id: {source, status, up, msg}} from AWS Braket (metadata read = free).
+    Only ids also seen on qBraid are kept, so name-normalisation misses drop out."""
+    out: dict = {}
+    try:
+        from braket.aws import AwsDevice  # amazon-braket-sdk
+    except Exception:
+        return out
+    try:
+        devs = AwsDevice.get_devices()
+    except Exception:
+        return out
+    for d in devs:
+        try:
+            prov = (getattr(d, "provider_name", "") or "").lower()
+            name = (getattr(d, "name", "") or "").lower().replace(" ", "-")
+            st = str(getattr(d, "status", "") or "").upper()   # ONLINE / OFFLINE / RETIRED
+            if not prov or not name:
+                continue
+            qid = f"aws:{prov}:qpu:{name}"
+            if known_ids and qid not in known_ids:
+                continue
+            out[qid] = {"source": "aws-braket", "status": st, "up": st == "ONLINE", "msg": ""}
+        except Exception:
+            continue
+    return out
+
+
+def _native_ibm(instance: Optional[str]) -> dict:
+    """{qbraid_id: {source, status, up, msg}} from IBM's own API (status read = free)."""
+    out: dict = {}
+    token = os.environ.get("IBM_QUANTUM_TOKEN")
+    if not token:
+        return out
+    try:
+        from qiskit_ibm_runtime import QiskitRuntimeService
+    except Exception:
+        return out
+    try:
+        kwargs = {"channel": "ibm_quantum_platform", "token": token}
+        inst = instance or os.environ.get("IBM_QUANTUM_INSTANCE")
+        if inst:
+            kwargs["instance"] = inst
+        svc = QiskitRuntimeService(**kwargs)
+        backends = svc.backends()
+    except Exception:
+        return out
+    for b in backends:
+        try:
+            st = b.status()
+            up = bool(getattr(st, "operational", False))
+            short = str(getattr(b, "name", "")).replace("ibm_", "")
+            out[f"ibm:ibm:qpu:{short}"] = {
+                "source": "ibm", "status": "ONLINE" if up else "OFFLINE",
+                "up": up, "msg": getattr(st, "status_msg", "") or ""}
+        except Exception:
+            continue
+    return out
+
+
+def append_crosscheck(log_path: str, rows: list[tuple]) -> None:
+    """Append (ts, device, qbraid_status, native_source, native_status, verdict) rows."""
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    new = not os.path.exists(log_path)
+    with open(log_path, "a", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        if new:
+            w.writerow(["timestamp_utc", "device_id", "qbraid_status",
+                        "native_source", "native_status", "verdict"])
+        w.writerows(rows)
+
+
+def do_crosscheck(cfg: dict, qbraid_key: Optional[str]) -> dict:
+    """Poll qBraid + native providers at one instant and compare per device."""
+    ts = iso(now_utc())
+    cc = cfg.get("crosscheck", {}) or {}
+    up_statuses = {s.upper() for s in cfg.get("up_statuses", ["ONLINE"])}
+
+    # fresh qBraid snapshot
+    qb: dict = {}
+    if qbraid_key:
+        try:
+            raw = _get_devices(cfg, qbraid_key)
+            if cfg.get("exclude_simulators", True):
+                raw = [d for d in raw if str(d.get("deviceType", "")).upper() != "SIMULATOR"]
+            for d in raw:
+                did = _dev_id(d)
+                if did:
+                    s = _dev_status(d) or "UNKNOWN"
+                    qb[did] = {"status": s, "up": str(s).upper() in up_statuses}
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError, ValueError):
+            qb = {}
+
+    # native snapshots
+    native: dict = {}
+    if cc.get("aws_braket", True):
+        native.update(_native_braket(set(qb)))
+    if cc.get("ibm", True):
+        native.update(_native_ibm(cc.get("ibm_instance")))
+
+    devices, log_rows, agree, disagree = [], [], 0, 0
+    for did, nv in sorted(native.items()):
+        q = qb.get(did)
+        if not q:
+            continue   # native saw it but qBraid didn't resolve it — can't compare
+        ok = (q["up"] == nv["up"])
+        agree += ok
+        disagree += (not ok)
+        devices.append({"device": did, "qbraid": q, "native": nv, "agree": ok})
+        log_rows.append((ts, did, q["status"], nv["source"], nv["status"],
+                         "agree" if ok else "disagree"))
+
+    result = {
+        "generated": ts,
+        "sources": sorted({nv["source"] for nv in native.values()}),
+        "checked": len(devices), "agree": agree, "disagree": disagree,
+        "devices": devices,
+    }
+    _write_json(_abspath(cfg.get("crosscheck_path", "data/crosscheck.json")), result)
+    if log_rows:
+        append_crosscheck(_abspath(cfg.get("crosscheck_log_path", "data/crosscheck_log.csv")), log_rows)
+    return result
+
+
+def _write_json(path: str, obj: dict) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(obj, fh, indent=2)
+        fh.write("\n")
+    os.replace(tmp, path)
+
+
 def do_poll(cfg: dict, api_key: Optional[str]) -> dict:
     ts = iso(now_utc())
     devices = cfg["devices"]
@@ -388,10 +527,11 @@ def write_report(cfg: dict, report: dict) -> str:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="qscrape.uptime",
                                 description="Poll live quantum-device availability and analyse downtime.")
-    p.add_argument("command", choices=["poll", "report", "list"],
+    p.add_argument("command", choices=["poll", "report", "list", "crosscheck"],
                    help="poll: query qBraid + append a sample + refresh report; "
                         "report: rebuild report from the log; "
-                        "list: print all qBraid devices + ids + live status (to find your device ids)")
+                        "list: print all qBraid devices + ids + live status (to find your device ids); "
+                        "crosscheck: poll qBraid + AWS/IBM natively and flag status disagreements")
     p.add_argument("--config", default=os.path.join(ROOT, "config", "uptime.json"))
     p.add_argument("--filter", default="", help="list: substring filter, e.g. --filter iqm")
     p.add_argument("--raw", action="store_true", help="list: dump raw JSON of the first devices (to confirm field names)")
@@ -426,6 +566,21 @@ def main(argv=None) -> int:
         for name, vendor, typ, st, ident in sorted(rows):
             print(f"  {name:22} {vendor:10} {typ:10} {st:12} {ident}")
         print(f"{len(rows)} device(s){' matching '+args.filter if args.filter else ''}")
+        return 0
+
+    if args.command == "crosscheck":
+        res = do_crosscheck(cfg, os.environ.get("QBRAID_API_KEY"))
+        if not args.quiet:
+            if not res["sources"]:
+                print("crosscheck: no native source available "
+                      "(need amazon-braket-sdk + AWS creds and/or qiskit-ibm-runtime + IBM_QUANTUM_TOKEN).")
+            else:
+                print(f"crosscheck: {res['generated']}  sources={','.join(res['sources'])}  "
+                      f"checked={res['checked']}  agree={res['agree']}  disagree={res['disagree']}")
+                for d in res["devices"]:
+                    if not d["agree"]:
+                        print(f"  DISAGREE {d['device']}: qBraid={d['qbraid']['status']} "
+                              f"vs {d['native']['source']}={d['native']['status']}")
         return 0
 
     if args.command == "poll":

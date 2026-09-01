@@ -15,5 +15,19 @@
   "up_statuses": ["ONLINE"],
   "log_path": "data/uptime_log.csv",
   "report_path": "data/uptime.json",
-  "schedule_path": "config/uptime_schedule.json"
+  "schedule_path": "config/uptime_schedule.json",
+
+  "_crosscheck_note": [
+    "Native cross-check: poll AWS Braket + IBM directly and compare their status",
+    "against qBraid's (which normalises + can lag). Runs on its own schedule (SDKs",
+    "+ AWS/IBM creds needed), writes crosscheck.json/_log — never touches uptime.json.",
+    "ibm_instance is the (non-secret) CRN; tokens/keys come from the env only."
+  ],
+  "crosscheck_path": "data/crosscheck.json",
+  "crosscheck_log_path": "data/crosscheck_log.csv",
+  "crosscheck": {
+    "aws_braket": true,
+    "ibm": true,
+    "ibm_instance": "crn:v1:bluemix:public:quantum-computing:us-east:a/0649c72b2be9486ba61b40d3e500bb5d:a8d5c529-b291-4322-a85b-2369c6298672::"
+  }
 }

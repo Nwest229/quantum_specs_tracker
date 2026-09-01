@@ -213,6 +213,26 @@ Trade-offs to know:
 `data/uptime_log.csv` and `data/uptime.json` are **tracked** (the Action commits them);
 only `data/uptime_cron.log` (local cron output) is gitignored.
 
+### Native cross-check (qBraid vs the provider's own API)
+
+qBraid is an aggregator: it normalises status from many providers and its cache can
+**lag** the real thing. The cross-check polls qBraid **and** AWS Braket + IBM directly
+at one instant and flags disagreements (e.g. "qBraid says ONLINE, AWS says OFFLINE").
+
+```bash
+export QBRAID_API_KEY=... AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... IBM_QUANTUM_TOKEN=...
+.venv/bin/python -m qscrape.uptime crosscheck
+```
+
+- **Needs** `amazon-braket-sdk` + AWS creds and/or `qiskit-ibm-runtime` + `IBM_QUANTUM_TOKEN`
+  (the IBM instance CRN — not secret — is in `config/uptime.json`). Missing a source → it's
+  skipped cleanly. All calls are metadata/status reads, so **$0** (no QPU time).
+- **Writes** `data/crosscheck.json` (current snapshot) + `data/crosscheck_log.csv` (history) —
+  it never touches `uptime.json`, so it can't conflict with the qBraid poller.
+- **Hosted:** `.github/workflows/crosscheck.yml` runs it every 6h (needs the `AWS_*` and
+  `IBM_QUANTUM_TOKEN` repo secrets). `uptime.html` shows a ✓/⚠ agree-or-disagree badge per
+  machine and marks disagreeing machines with ⚠ in the drill-down.
+
 ## A few things worth knowing
 
 - **No time series (for the *price/spec* tracker).** That data was collected on random
