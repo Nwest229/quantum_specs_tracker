@@ -1,12 +1,12 @@
 {
-  "generated": "2026-09-05T15:12:24+00:00",
+  "generated": "2026-09-05T20:19:18+00:00",
   "sources": [
     "aws-braket",
     "ibm"
   ],
   "checked": 10,
-  "agree": 7,
-  "disagree": 3,
+  "agree": 6,
+  "disagree": 4,
   "devices": [
     {
       "device": "aws:aqt:qpu:ibex-q1",
@@ -95,8 +95,8 @@
     {
       "device": "aws:rigetti:qpu:cepheus-1-108q",
       "qbraid": {
-        "status": "ONLINE",
-        "up": true
+        "status": "UNAVAILABLE",
+        "up": false
       },
       "native": {
         "source": "aws-braket",
@@ -104,7 +104,7 @@
         "up": true,
         "msg": ""
       },
-      "agree": true
+      "agree": false
     },
     {
       "device": "ibm:ibm:qpu:fez",
