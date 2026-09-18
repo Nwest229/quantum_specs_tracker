@@ -3041,5 +3041,131 @@
     ],
     "added": [],
     "removed": []
+  },
+  {
+    "generated": "2026-09-18T09:51:49+00:00",
+    "changed": [
+      {
+        "backend": "Rigetti Cepheus-1-108Q",
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "field": "fidelity.1q_avg",
+        "from": 0.983173,
+        "to": 0.982504
+      },
+      {
+        "backend": "Rigetti Cepheus-1-108Q",
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "field": "fidelity.1q_max",
+        "from": 0.999563,
+        "to": 0.999679
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_avg",
+        "from": 0.999527,
+        "to": 0.999522
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_max",
+        "from": 0.999818,
+        "to": 0.999805
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_min",
+        "from": 0.995737,
+        "to": 0.995845
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_avg",
+        "from": 0.994269,
+        "to": 0.994571
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_max",
+        "from": 0.998781,
+        "to": 0.998704
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_min",
+        "from": 0.910649,
+        "to": 0.920932
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.spam_avg",
+        "from": 0.987421,
+        "to": 0.98668
+      },
+      {
+        "backend": "IonQ Forte Enterprise 1",
+        "id": "ionq-ionq-forte-enterprise-1",
+        "field": "fidelity.2q_avg",
+        "from": 0.9908,
+        "to": 0.9907
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_avg",
+        "from": 0.998734,
+        "to": 0.998946
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_max",
+        "from": 0.99972,
+        "to": 0.999666
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_min",
+        "from": 0.990055,
+        "to": 0.995901
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_avg",
+        "from": 0.990386,
+        "to": 0.993432
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_max",
+        "from": 0.997757,
+        "to": 0.99788
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_min",
+        "from": 0.966008,
+        "to": 0.98717
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.spam_avg",
+        "from": 0.979293,
+        "to": 0.9772
+      }
+    ],
+    "added": [],
+    "removed": []
   }
 ]
