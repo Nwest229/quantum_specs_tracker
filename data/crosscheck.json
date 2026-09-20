@@ -1,12 +1,12 @@
 {
-  "generated": "2026-09-19T20:38:39+00:00",
+  "generated": "2026-09-20T04:52:42+00:00",
   "sources": [
     "aws-braket",
     "ibm"
   ],
   "checked": 10,
-  "agree": 6,
-  "disagree": 4,
+  "agree": 7,
+  "disagree": 3,
   "devices": [
     {
       "device": "aws:aqt:qpu:ibex-q1",
@@ -39,13 +39,13 @@
     {
       "device": "aws:ionq:qpu:forte-enterprise-1",
       "qbraid": {
-        "status": "ONLINE",
-        "up": true
+        "status": "OFFLINE",
+        "up": false
       },
       "native": {
         "source": "aws-braket",
-        "status": "ONLINE",
-        "up": true,
+        "status": "OFFLINE",
+        "up": false,
         "msg": ""
       },
       "agree": true
@@ -95,8 +95,8 @@
     {
       "device": "aws:rigetti:qpu:cepheus-1-108q",
       "qbraid": {
-        "status": "UNAVAILABLE",
-        "up": false
+        "status": "ONLINE",
+        "up": true
       },
       "native": {
         "source": "aws-braket",
@@ -104,7 +104,7 @@
         "up": true,
         "msg": ""
       },
-      "agree": false
+      "agree": true
     },
     {
       "device": "ibm:ibm:qpu:fez",
