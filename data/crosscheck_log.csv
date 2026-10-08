@@ -1329,3 +1329,13 @@ timestamp_utc,device_id,qbraid_status,native_source,native_status,verdict
 2026-10-07T23:04:18+00:00,ibm:ibm:qpu:fez,ONLINE,ibm,ONLINE,agree
 2026-10-07T23:04:18+00:00,ibm:ibm:qpu:kingston,ONLINE,ibm,ONLINE,agree
 2026-10-07T23:04:18+00:00,ibm:ibm:qpu:marrakesh,ONLINE,ibm,ONLINE,agree
+2026-10-08T06:01:54+00:00,aws:aqt:qpu:ibex-q1,UNAVAILABLE,aws-braket,ONLINE,disagree
+2026-10-08T06:01:54+00:00,aws:ionq:qpu:forte-1,ONLINE,aws-braket,ONLINE,agree
+2026-10-08T06:01:54+00:00,aws:ionq:qpu:forte-enterprise-1,ONLINE,aws-braket,ONLINE,agree
+2026-10-08T06:01:54+00:00,aws:iqm:qpu:emerald,UNAVAILABLE,aws-braket,ONLINE,disagree
+2026-10-08T06:01:54+00:00,aws:iqm:qpu:garnet,ONLINE,aws-braket,ONLINE,agree
+2026-10-08T06:01:54+00:00,aws:quera:qpu:aquila,UNAVAILABLE,aws-braket,ONLINE,disagree
+2026-10-08T06:01:54+00:00,aws:rigetti:qpu:cepheus-1-108q,ONLINE,aws-braket,ONLINE,agree
+2026-10-08T06:01:54+00:00,ibm:ibm:qpu:fez,ONLINE,ibm,ONLINE,agree
+2026-10-08T06:01:54+00:00,ibm:ibm:qpu:kingston,ONLINE,ibm,ONLINE,agree
+2026-10-08T06:01:54+00:00,ibm:ibm:qpu:marrakesh,ONLINE,ibm,ONLINE,agree
