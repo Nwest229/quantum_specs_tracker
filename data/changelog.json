@@ -6282,5 +6282,124 @@
     ],
     "added": [],
     "removed": []
+  },
+  {
+    "generated": "2026-10-12T13:16:10+00:00",
+    "changed": [
+      {
+        "backend": "Rigetti Cepheus-1-108Q",
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "field": "fidelity.1q_avg",
+        "from": 0.974018,
+        "to": 0.969394
+      },
+      {
+        "backend": "Rigetti Cepheus-1-108Q",
+        "id": "rigetti-rigetti-cepheus-1-108q",
+        "field": "fidelity.1q_max",
+        "from": 0.999534,
+        "to": 0.999435
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_avg",
+        "from": 0.999316,
+        "to": 0.999339
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_max",
+        "from": 0.999796,
+        "to": 0.999827
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.1q_min",
+        "from": 0.995381,
+        "to": 0.995313
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_avg",
+        "from": 0.993035,
+        "to": 0.993411
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_max",
+        "from": 0.998932,
+        "to": 0.998561
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.2q_min",
+        "from": 0.914819,
+        "to": 0.915272
+      },
+      {
+        "backend": "IQM Emerald",
+        "id": "42",
+        "field": "fidelity.spam_avg",
+        "from": 0.985935,
+        "to": 0.985165
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_avg",
+        "from": 0.999044,
+        "to": 0.999097
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_max",
+        "from": 0.999606,
+        "to": 0.999614
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.1q_min",
+        "from": 0.993894,
+        "to": 0.996121
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_avg",
+        "from": 0.99132,
+        "to": 0.993904
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_max",
+        "from": 0.996688,
+        "to": 0.998209
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.2q_min",
+        "from": 0.966675,
+        "to": 0.988373
+      },
+      {
+        "backend": "IQM Garnet",
+        "id": "41",
+        "field": "fidelity.spam_avg",
+        "from": 0.975303,
+        "to": 0.978383
+      }
+    ],
+    "added": [],
+    "removed": []
   }
 ]
