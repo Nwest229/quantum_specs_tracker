@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-27T22:12:29+00:00",
+  "generated": "2026-10-28T05:39:46+00:00",
   "sources": [
     "aws-braket",
     "ibm"
@@ -53,13 +53,13 @@
     {
       "device": "aws:iqm:qpu:emerald",
       "qbraid": {
-        "status": "ONLINE",
-        "up": true
+        "status": "OFFLINE",
+        "up": false
       },
       "native": {
         "source": "aws-braket",
-        "status": "ONLINE",
-        "up": true,
+        "status": "OFFLINE",
+        "up": false,
         "msg": ""
       },
       "agree": true
