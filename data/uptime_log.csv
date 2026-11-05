@@ -21950,3 +21950,4 @@ timestamp_utc,device_id,status,status_msg
 2026-11-05T07:24:50+00:00,openquantum:iqm:qpu:garnet,ONLINE,
 2026-11-05T07:24:50+00:00,openquantum:rigetti:qpu:cepheus-1-108q,ONLINE,
 2026-11-05T15:48:42+00:00,*,POLL_ERROR,HTTP Error 401: Unauthorized
+2026-11-05T21:46:28+00:00,*,POLL_ERROR,HTTP Error 401: Unauthorized
