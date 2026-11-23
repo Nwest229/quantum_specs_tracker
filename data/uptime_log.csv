@@ -22015,3 +22015,4 @@ timestamp_utc,device_id,status,status_msg
 2026-11-22T19:26:51+00:00,*,POLL_ERROR,HTTP Error 401: Unauthorized
 2026-11-23T00:29:13+00:00,*,POLL_ERROR,HTTP Error 401: Unauthorized
 2026-11-23T08:15:51+00:00,*,POLL_ERROR,HTTP Error 401: Unauthorized
+2026-11-23T20:34:30+00:00,*,POLL_ERROR,HTTP Error 401: Unauthorized
